@@ -1,0 +1,22 @@
+version: "3.4"
+
+services:
+  mysql:
+    image: mysql:8.3
+    platform: linux/x86_64
+    restart: unless-stopped
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: 1
+      MYSQL_DATABASE: 'aphrodite'
+      MYSQL_USER: 'aphrodite'
+      MYSQL_PASSWORD: 'hYh8&9P5ae1h3dJLnGVrZM'
+    volumes:
+      - mysql:/var/lib/mysql
+
+volumes:
+  mysql:
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
