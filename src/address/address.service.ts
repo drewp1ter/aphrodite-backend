@@ -15,7 +15,14 @@ export class AddressService {
   ) {}
 
   async create(userId: number, dto: CreateAddressDto) {
-    const address = new Address(dto.city, dto.address, dto.isDefault)
+    let address
+
+    address = await this.addressRepository.findOne({ city: dto.city, address: dto.address }, { exclude: ['user'] })
+    if (address) {
+      return address.toJSON()
+    }
+
+    address = new Address(dto.city, dto.address, dto.isDefault)
     address.id = await this.addressRepository.insertAndReturnId(userId, address)
     return address.toJSON()
   }
