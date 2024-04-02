@@ -17,13 +17,13 @@ export class UserService {
     return this.userRepository.findAll()
   }
 
-  async findOne(loginUserDto: LoginUserDto): Promise<User> {
+  async findOne(loginUserDto: LoginUserDto): Promise<User | null> {
     const findOneOptions = {
       email: loginUserDto.email,
       password: crypto.createHmac('sha256', loginUserDto.password).digest('hex')
     }
 
-    return this.userRepository.findOneOrFail(findOneOptions)
+    return this.userRepository.findOne(findOneOptions)
   }
 
   async create(dto: CreateUserDto): Promise<IUserRO> {
@@ -40,7 +40,7 @@ export class UserService {
       )
     }
 
-    const user = new User({ username, email, password, phone })
+    const user = new User(username, email, password, phone)
     const errors = await validate(user)
 
     if (errors.length > 0) {

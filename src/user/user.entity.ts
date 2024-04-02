@@ -1,9 +1,9 @@
 import { IsEmail, IsPhoneNumber, IsOptional } from 'class-validator'
 import crypto from 'crypto'
-import { Collection, Entity, EntityDTO, EntityRepositoryType, ManyToMany, PrimaryKey, Property, Unique, wrap } from '@mikro-orm/core'
+import { Collection, Entity, EntityDTO, EntityRepositoryType, ManyToMany, OneToMany, PrimaryKey, Property, Unique, wrap } from '@mikro-orm/core'
 import { Role } from '../role/role.entity'
+import { Address } from '../address/address.entity'
 import { UserRepository } from './user.repository'
-import { CreateUserDto } from './dto'
 
 @Entity({ repository: () => UserRepository })
 export class User {
@@ -20,7 +20,7 @@ export class User {
   @IsEmail()
   email: string
 
-  @Property({ default: '' })
+  @Property({ nullable: true, default: '' })
   @IsOptional()
   @IsPhoneNumber()
   phone?: string
@@ -28,14 +28,25 @@ export class User {
   @Property({ hidden: true })
   password: string
 
-  @ManyToMany({ hidden: true })
+  @OneToMany(() => Address, address => address.user, { orphanRemoval: true })
+  addresses = new Collection<Address>(this)
+
+  @ManyToMany(() => Role)
   roles = new Collection<Role>(this)
 
-  constructor({ username, email, password, phone }: CreateUserDto) {
+  @Property({ onUpdate: () => new Date() })
+  updatedAt: Date
+
+  @Property()
+  createdAt: Date
+
+  constructor(username: string, email: string, password: string, phone: string = '') {
     this.username = username
     this.email = email
     this.phone = phone
     this.password = crypto.createHmac('sha256', password).digest('hex')
+    this.createdAt = new Date()
+    this.updatedAt = new Date()
   }
 
   toJSON(user?: User) {
@@ -46,5 +57,4 @@ export class User {
 }
 
 interface UserDTO extends EntityDTO<User> {
-  following?: boolean
 }
