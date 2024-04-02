@@ -11,5 +11,5 @@ export class CreateAddressDto {
 
   @IsOptional()
   @IsBoolean()
-  isDefalt?: boolean
+  isDefault?: boolean
 }
