@@ -4,10 +4,11 @@ import { MikroOrmMiddleware, MikroOrmModule } from '@mikro-orm/nestjs'
 
 import { AppController } from './app.controller'
 import { UserModule } from './user/user.module'
+import { AddressModule } from './address/address.module'
 
 @Module({
   controllers: [AppController],
-  imports: [MikroOrmModule.forRoot(), UserModule],
+  imports: [MikroOrmModule.forRoot(), UserModule, AddressModule],
   providers: []
 })
 export class AppModule implements NestModule, OnModuleInit {
