@@ -13,7 +13,7 @@ describe('UsersController', () => {
         email,
         phone: '555',
         token: 'exampleoftesttoken',
-        username: 'testusername'
+        name: 'testname'
       }
     }),
     create: jest.fn((dto: CreateUserDto) => {
@@ -21,7 +21,7 @@ describe('UsersController', () => {
         email: dto.email,
         phone: '555',
         token: 'exampleoftesttoken',
-        username: dto.username
+        name: dto.name
       }
     }),
     update: jest.fn((id, dto: UpdateUserDto) => {
@@ -29,7 +29,7 @@ describe('UsersController', () => {
         email: dto.email,
         phone: dto.phone,
         token: 'exampleoftesttoken',
-        username: dto.username
+        name: dto.name
       }
     }),
     delete: jest.fn(() => {
@@ -60,7 +60,7 @@ describe('UsersController', () => {
       email,
       phone: '555',
       token: 'exampleoftesttoken',
-      username: 'testusername'
+      name: 'testname'
     })
   })
   it('should create user and return him', async () => {
@@ -69,14 +69,14 @@ describe('UsersController', () => {
       await controller.create({
         email,
         phone: '555',
-        username: 'test',
+        name: 'test',
         password: 'test'
       })
     ).toEqual({
       email,
       phone: '555',
       token: 'exampleoftesttoken',
-      username: 'test'
+      name: 'test'
     })
   })
   it('should update user and return him', async () => {
@@ -85,13 +85,13 @@ describe('UsersController', () => {
       await controller.update(1, {
         email,
         phone: '+79991234567',
-        username: 'testupdated',
+        name: 'testupdated',
       })
     ).toEqual({
       email,
       phone: '+79991234567',
       token: 'exampleoftesttoken',
-      username: 'testupdated'
+      name: 'testupdated'
     })
   })
   it('should delete user', async () => {

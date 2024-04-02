@@ -153,13 +153,13 @@
         },
         "flags": {
           "name": "flags",
-          "type": "int",
+          "type": "smallint",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
           "default": "0",
-          "mappedType": "integer"
+          "mappedType": "smallint"
         },
         "calories": {
           "name": "calories",
@@ -301,8 +301,8 @@
           "nullable": false,
           "mappedType": "integer"
         },
-        "username": {
-          "name": "username",
+        "name": {
+          "name": "name",
           "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
@@ -317,6 +317,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "default": "''",
           "mappedType": "string"
         },
         "phone": {
@@ -325,8 +326,7 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": true,
-          "default": "''",
+          "nullable": false,
           "mappedType": "string"
         },
         "password": {
@@ -363,10 +363,10 @@
       "indexes": [
         {
           "columnNames": [
-            "email"
+            "phone"
           ],
           "composite": false,
-          "keyName": "user_email_unique",
+          "keyName": "user_phone_unique",
           "constraint": true,
           "primary": false,
           "unique": true

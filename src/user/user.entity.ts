@@ -1,4 +1,4 @@
-import { IsEmail, IsPhoneNumber, IsOptional } from 'class-validator'
+import { IsEmail, IsPhoneNumber } from 'class-validator'
 import crypto from 'crypto'
 import { Collection, Entity, EntityDTO, EntityRepositoryType, ManyToMany, OneToMany, PrimaryKey, Property, Unique, wrap } from '@mikro-orm/core'
 import { Role } from '../role/role.entity'
@@ -13,17 +13,16 @@ export class User {
   id!: number
 
   @Property()
-  username: string
+  name: string
 
-  @Property()
-  @Unique()
+  @Property({ default: '' })
   @IsEmail()
   email: string
 
-  @Property({ nullable: true, default: '' })
-  @IsOptional()
+  @Property()
+  @Unique()
   @IsPhoneNumber()
-  phone?: string
+  phone: string
 
   @Property({ hidden: true })
   password: string
@@ -40,8 +39,8 @@ export class User {
   @Property()
   createdAt: Date
 
-  constructor(username: string, email: string, password: string, phone: string = '') {
-    this.username = username
+  constructor(name: string, password: string, phone, email: string = '') {
+    this.name = name
     this.email = email
     this.phone = phone
     this.password = crypto.createHmac('sha256', password).digest('hex')

@@ -3,7 +3,7 @@ export interface IUserData {
   email: string
   phone?: string
   token: string
-  username: string
+  name: string
 }
 
 export interface IUserRO {

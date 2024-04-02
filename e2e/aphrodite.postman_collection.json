@@ -1,8 +1,8 @@
 {
 	"info": {
 		"_postman_id": "460e0cce-cd3b-48f7-bace-8e73830f0432",
-		"name": "Conduit",
-		"description": "Collection for testing the Conduit API\n\nhttps://github.com/gothinkster/realworld",
+		"name": "aphrodite",
+		"description": "",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "33972319"
 	},
@@ -310,6 +310,87 @@
 							"path": [
 								"api",
 								"addresses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create address",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"address\": {\"city\": \"city 17\", \"address\": \"black mesa\"} }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{APIURL}}/api/addresses",
+							"host": [
+								"{{APIURL}}"
+							],
+							"path": [
+								"api",
+								"addresses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete address",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{APIURL}}/api/addresses/1",
+							"host": [
+								"{{APIURL}}"
+							],
+							"path": [
+								"api",
+								"addresses",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Product",
+			"item": [
+				{
+					"name": "Get products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{APIURL}}/api/products",
+							"host": [
+								"{{APIURL}}"
+							],
+							"path": [
+								"api",
+								"products"
 							]
 						}
 					},

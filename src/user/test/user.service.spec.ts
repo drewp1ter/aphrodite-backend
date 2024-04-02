@@ -18,7 +18,7 @@ describe('UsersService', () => {
         email: 'test@test.com' || options.email,
         password: 'test' || options.password,
         phone: '+79991234567',
-        username: 'test'
+        name: 'test'
       }
     }),
     count: jest.fn().mockImplementation(() => 0),
@@ -27,7 +27,7 @@ describe('UsersService', () => {
       id: Date.now(),
       email: 'test@test.com' || options.email,
       phone: '+79991234567',
-      username: 'test'
+      name: 'test'
     }))
   }
 
@@ -63,7 +63,7 @@ describe('UsersService', () => {
     expect(user).toEqual({
       id: expect.any(Number),
       email: 'test@test.com',
-      username: 'test',
+      name: 'test',
       phone: '+79991234567'
     })
   })
@@ -75,13 +75,13 @@ describe('UsersService', () => {
       await service.create({
         email: 'notfound@test.com',
         password: 'test',
-        username: 'testtest',
+        name: 'testtest',
       })
     ).toEqual({
       user: {
         email: 'notfound@test.com',
         token: expect.any(String),
-        username: 'testtest'
+        name: 'testtest'
       }
     })
   })
@@ -91,7 +91,7 @@ describe('UsersService', () => {
         email: 'test@test.com',
         phone: '+79991234567',
         token: expect.any(String),
-        username: 'test'
+        name: 'test'
       }
     })
   })
@@ -101,7 +101,7 @@ describe('UsersService', () => {
         email: 'test@test.com',
         phone: '+79991234567',
         token: expect.any(String),
-        username: 'test'
+        name: 'test'
       }
     })
   })

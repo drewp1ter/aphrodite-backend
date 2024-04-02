@@ -27,27 +27,27 @@ export class UserService {
   }
 
   async create(dto: CreateUserDto): Promise<IUserRO> {
-    const { username, email, password, phone } = dto
+    const { name, email, password, phone } = dto
     const exists = await this.userRepository.findOne({ email })
 
     if (exists) {
       throw new HttpException(
         {
           message: 'Input data validation failed',
-          errors: { username: 'Email must be unique.' }
+          errors: { name: 'Email must be unique.' }
         },
         HttpStatus.BAD_REQUEST
       )
     }
 
-    const user = new User(username, email, password, phone)
+    const user = new User(name, password, phone, email)
     const errors = await validate(user)
 
     if (errors.length > 0) {
       throw new HttpException(
         {
           message: 'Input data validation failed',
-          errors: { username: 'Userinput is not valid.' }
+          errors: { name: 'Userinput is not valid.' }
         },
         HttpStatus.BAD_REQUEST
       )
@@ -92,10 +92,8 @@ export class UserService {
 
     return jwt.sign(
       {
-        email: user.email,
         exp: exp.getTime() / 1000,
-        id: user.id,
-        username: user.username
+        id: user.id
       },
       SECRET
     )
@@ -106,7 +104,7 @@ export class UserService {
       email: user.email,
       phone: user.phone,
       token: this.generateJWT(user),
-      username: user.username
+      name: user.name
     } as any
 
     return { user: userRO }
