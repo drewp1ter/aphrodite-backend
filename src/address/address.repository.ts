@@ -1,6 +1,5 @@
 import { EntityRepository } from '@mikro-orm/mysql'
-import { Address, AddressDto } from './address.entity'
-import { CreateAddressDto } from './dto'
+import { Address } from './address.entity'
 
 export class AddressRepository extends EntityRepository<Address> {
   async findAllUserAddresses(userId: number) {
