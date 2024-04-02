@@ -19,10 +19,9 @@ export class Address {
   isDefault: boolean
 
   @ManyToOne()
-  user: User
+  user!: User
 
-  constructor(user: User, city: string, address: string, isDefalt: boolean = false) {
-    this.user = user
+  constructor(city: string, address: string, isDefalt: boolean = false) {
     this.city = city
     this.address = address
     this.isDefault = isDefalt
