@@ -1,4 +1,4 @@
-import { IsNotEmpty, MaxLength, IsBoolean, IsOptional } from 'class-validator'
+import { IsNotEmpty, MaxLength } from 'class-validator'
 
 export class CreateAddressDto {
   @IsNotEmpty()
@@ -8,8 +8,4 @@ export class CreateAddressDto {
   @IsNotEmpty()
   @MaxLength(1000)
   readonly address!: string
-
-  @IsOptional()
-  @IsBoolean()
-  isDefault?: boolean
 }

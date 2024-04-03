@@ -6,11 +6,11 @@ export class AddressRepository extends EntityRepository<Address> {
     return this.em.createQueryBuilder(Address).select(['id', 'city', 'address', 'isDefault']).where({ user_id: userId }).getResult()
   }
 
-  async insertAndReturnId(userId: number, address: Address): Promise<number> {
+  async insertAndReturnId(address: Address): Promise<number> {
     const { insertId } = await this.em
       .createQueryBuilder(Address)
       .insert({
-        user: userId,
+        user: address.user.id,
         city: address.city,
         address: address.address,
         isDefault: address.isDefault ?? false,

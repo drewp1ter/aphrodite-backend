@@ -10,7 +10,7 @@ export class Address {
   id!: number
 
   @ManyToOne()
-  user!: User
+  user: User
 
   @Property()
   city: string
@@ -27,7 +27,8 @@ export class Address {
   @Property()
   createdAt: Date
 
-  constructor(city: string, address: string, isDefalt: boolean = false) {
+  constructor(user: User, city: string, address: string, isDefalt: boolean = false) {
+    this.user = user
     this.city = city
     this.address = address
     this.isDefault = isDefalt

@@ -1,5 +1,6 @@
-import { Entity, PrimaryKey, EntityRepositoryType, Property, ManyToOne, EntityDTO, Index, wrap, types } from '@mikro-orm/core'
+import { Entity, PrimaryKey, EntityRepositoryType, Property, ManyToOne, EntityDTO, Index, ManyToMany, Collection, wrap, types } from '@mikro-orm/core'
 import { ProductGroup } from './product-group.entity'
+import { Order } from '../order/order.entity'
 import { ProductRepository } from './product.repository'
 @Entity({ repository: () => ProductRepository })
 export class Product {
@@ -10,6 +11,9 @@ export class Product {
 
   @ManyToOne()
   group!: ProductGroup
+
+  @ManyToMany({ entity: () => Order, mappedBy: order => order.products })
+  orders = new Collection<Order>(this)
 
   @Property()
   @Index({ type: 'fulltext' })

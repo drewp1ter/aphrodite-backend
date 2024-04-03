@@ -1,5 +1,6 @@
-import { Body, Controller, Delete, HttpStatus, Param, Post, Get, HttpException } from '@nestjs/common'
+import { Body, Controller, Delete, HttpStatus, Param, Post, Get, UsePipes } from '@nestjs/common'
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger'
+import { ValidationPipe } from '../shared/pipes/validation.pipe'
 import { AddressService } from './address.service'
 import { User } from '../user/user.decorator'
 import { CreateAddressDto } from './dto'
@@ -13,6 +14,7 @@ export class AddressController {
   @ApiOperation({ summary: 'Create address' })
   @ApiResponse({ status: HttpStatus.CREATED, description: 'The address has been successfully created.' })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
+  @UsePipes(new ValidationPipe())
   @Post()
   async create(@User('id') userId: number, @Body('address') addressData: CreateAddressDto) {
     return this.addressService.create(userId, addressData)

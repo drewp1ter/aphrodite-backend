@@ -4,6 +4,7 @@ import { InjectRepository } from '@mikro-orm/nestjs'
 import { Address } from './address.entity'
 import { AddressRepository } from './address.repository'
 import { CreateAddressDto } from './dto'
+import { User } from '../user/user.entity'
 
 @Injectable()
 export class AddressService {
@@ -16,14 +17,16 @@ export class AddressService {
 
   async create(userId: number, dto: CreateAddressDto) {
     let address
+    const user = new User('', '', '')
+    user.id = userId
 
-    address = await this.addressRepository.findOne({ city: dto.city, address: dto.address }, { exclude: ['user'] })
+    address = await this.addressRepository.findOne({ user: userId, city: dto.city, address: dto.address }, { exclude: ['user'] })
     if (address) {
       return address.toJSON()
     }
 
-    address = new Address(dto.city, dto.address, dto.isDefault)
-    address.id = await this.addressRepository.insertAndReturnId(userId, address)
+    address = new Address(user, dto.city, dto.address)
+    address.id = await this.addressRepository.insertAndReturnId(address)
     return address.toJSON()
   }
 
