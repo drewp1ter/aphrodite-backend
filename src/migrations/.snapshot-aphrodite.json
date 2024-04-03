@@ -12,6 +12,257 @@
           "nullable": false,
           "mappedType": "integer"
         },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "description": {
+          "name": "description",
+          "type": "varchar(8192)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 8192,
+          "default": "''",
+          "mappedType": "string"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "mappedType": "datetime"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "mappedType": "datetime"
+        }
+      },
+      "name": "product_group",
+      "indexes": [
+        {
+          "keyName": "product_group_name_index",
+          "columnNames": [
+            "name"
+          ],
+          "composite": false,
+          "constraint": false,
+          "primary": false,
+          "unique": false,
+          "type": "fulltext"
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "group_id": {
+          "name": "group_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "description": {
+          "name": "description",
+          "type": "varchar(8192)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 8192,
+          "default": "''",
+          "mappedType": "string"
+        },
+        "squirrels": {
+          "name": "squirrels",
+          "type": "float",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "0",
+          "mappedType": "float"
+        },
+        "fats": {
+          "name": "fats",
+          "type": "float",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "0",
+          "mappedType": "float"
+        },
+        "carbohydrates": {
+          "name": "carbohydrates",
+          "type": "float",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "0",
+          "mappedType": "float"
+        },
+        "flags": {
+          "name": "flags",
+          "type": "smallint",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "0",
+          "mappedType": "smallint"
+        },
+        "calories": {
+          "name": "calories",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "0",
+          "mappedType": "integer"
+        },
+        "price": {
+          "name": "price",
+          "type": "float",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "float"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "mappedType": "datetime"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "mappedType": "datetime"
+        }
+      },
+      "name": "product",
+      "indexes": [
+        {
+          "columnNames": [
+            "group_id"
+          ],
+          "composite": false,
+          "keyName": "product_group_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "product_name_index",
+          "columnNames": [
+            "name"
+          ],
+          "composite": false,
+          "constraint": false,
+          "primary": false,
+          "unique": false,
+          "type": "fulltext"
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "product_group_id_foreign": {
+          "constraintName": "product_group_id_foreign",
+          "columnNames": [
+            "group_id"
+          ],
+          "localTableName": "product",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "product_group",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "mappedType": "integer"
+        },
         "role": {
           "name": "role",
           "type": "varchar(255)",
@@ -50,8 +301,8 @@
           "nullable": false,
           "mappedType": "integer"
         },
-        "username": {
-          "name": "username",
+        "name": {
+          "name": "name",
           "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
@@ -66,6 +317,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "default": "''",
           "mappedType": "string"
         },
         "phone": {
@@ -74,8 +326,7 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": true,
-          "default": "''",
+          "nullable": false,
           "mappedType": "string"
         },
         "password": {
@@ -112,10 +363,10 @@
       "indexes": [
         {
           "columnNames": [
-            "email"
+            "phone"
           ],
           "composite": false,
-          "keyName": "user_email_unique",
+          "keyName": "user_phone_unique",
           "constraint": true,
           "primary": false,
           "unique": true
@@ -143,6 +394,15 @@
           "unsigned": true,
           "autoincrement": true,
           "primary": true,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
           "nullable": false,
           "mappedType": "integer"
         },
@@ -174,14 +434,25 @@
           "default": "false",
           "mappedType": "boolean"
         },
-        "user_id": {
-          "name": "user_id",
-          "type": "int",
-          "unsigned": true,
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "integer"
+          "length": 0,
+          "mappedType": "datetime"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "mappedType": "datetime"
         }
       },
       "name": "address",

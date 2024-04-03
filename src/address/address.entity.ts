@@ -9,6 +9,9 @@ export class Address {
   @PrimaryKey()
   id!: number
 
+  @ManyToOne()
+  user!: User
+
   @Property()
   city: string
 
@@ -18,13 +21,18 @@ export class Address {
   @Property({ default: false })
   isDefault: boolean
 
-  @ManyToOne()
-  user!: User
+  @Property({ onUpdate: () => new Date() })
+  updatedAt: Date
+
+  @Property()
+  createdAt: Date
 
   constructor(city: string, address: string, isDefalt: boolean = false) {
     this.city = city
     this.address = address
     this.isDefault = isDefalt
+    this.createdAt = new Date()
+    this.updatedAt = new Date()
   }
 
   toJSON() {
