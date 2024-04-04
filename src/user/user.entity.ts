@@ -13,21 +13,21 @@ export class User {
   id!: number
 
   @Property()
-  name: string
+  name!: string
 
   @Property({ default: '' })
   @IsEmail()
-  email: string
+  email!: string
 
   @Property()
   @Unique()
   @IsPhoneNumber()
-  phone: string
+  phone!: string
 
   @Property({ hidden: true })
   password: string
 
-  @OneToMany(() => Address, address => address.user, { orphanRemoval: true })
+  @ManyToMany({ entity: () => Address, pivotEntity: () => Address })
   addresses = new Collection<Address>(this)
 
   @ManyToMany(() => Role)
@@ -39,11 +39,9 @@ export class User {
   @Property()
   createdAt: Date
 
-  constructor(name: string, password: string, phone, email: string = '') {
-    this.name = name
-    this.email = email
-    this.phone = phone
-    this.password = crypto.createHmac('sha256', password).digest('hex')
+  constructor(partial: Partial<Pick<User, 'name' | 'email' | 'password' | 'phone'>>) {
+    Object.assign(this, partial)
+    this.password = partial.password ? crypto.createHmac('sha256', partial.password).digest('hex') : ''
     this.createdAt = new Date()
     this.updatedAt = new Date()
   }

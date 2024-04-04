@@ -40,7 +40,7 @@ export class UserService {
       )
     }
 
-    const user = new User(name, password, phone, email)
+    const user = new User({ name, password, phone, email })
     const errors = await validate(user)
 
     if (errors.length > 0) {

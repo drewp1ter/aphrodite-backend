@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "460e0cce-cd3b-48f7-bace-8e73830f0432",
 		"name": "aphrodite",
-		"description": "",
+		"description": "Collection for testing the Conduit API\n\nhttps://github.com/gothinkster/realworld",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "33972319"
 	},
@@ -33,7 +33,8 @@
 									"}",
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -51,7 +52,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"user\":{\"email\":\"admin2@gmail.com\", \"password\":\"password13245678\", \"username\":\"admin2\", \"phone\": \"+79991234567\"}}"
+							"raw": "{\"user\":{\"email\":\"admin2@gmail.com\", \"password\":\"password13245678\", \"name\":\"admin2\", \"phone\": \"+79991234567\"}}"
 						},
 						"url": {
 							"raw": "{{APIURL}}/api/users",
@@ -87,7 +88,8 @@
 									"tests['User has \"token\" property'] = user.hasOwnProperty('token');",
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -328,7 +330,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{ \"address\": {\"city\": \"city 17\", \"address\": \"black mesa\"} }",
+							"raw": "{ \"address\": {\"city\": \"city 17\", \"address\": \"black mesa6\"} }",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -391,6 +393,38 @@
 							"path": [
 								"api",
 								"products"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Order",
+			"item": [
+				{
+					"name": "create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phone\": \"+79910000000\",\n    \"name\": \"John Doe\",\n    \"comment\": \"some comment\",\n    \"oaymentType\": \"cash\",\n    \"address\": {\n        \"city\": \"city 17\",\n        \"address\": \"Black mesa\"\n    },\n    \"items\": {\n        \"productId\": 1,\n        \"amount\": 2\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{APIURL}}/api/",
+							"host": [
+								"{{APIURL}}"
+							],
+							"path": [
+								"api",
+								""
 							]
 						}
 					},

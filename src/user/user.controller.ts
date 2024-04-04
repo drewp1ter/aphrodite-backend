@@ -1,4 +1,5 @@
 import { Body, Controller, Delete, Get, HttpException, Param, Post, Put, UsePipes } from '@nestjs/common'
+import { UniqueConstraintViolationException } from '@mikro-orm/mysql'
 import { ValidationPipe } from '../shared/pipes/validation.pipe'
 import { CreateUserDto, LoginUserDto, UpdateUserDto } from './dto'
 import { User } from './user.decorator'
@@ -26,7 +27,13 @@ export class UserController {
   @UsePipes(new ValidationPipe())
   @Post('users')
   async create(@Body('user') userData: CreateUserDto) {
-    return this.userService.create(userData)
+    try {
+      await this.userService.create(userData)
+      return
+    } catch (e) {
+      if (e instanceof UniqueConstraintViolationException) return
+      throw e
+    }
   }
 
   @Delete('users/:slug')

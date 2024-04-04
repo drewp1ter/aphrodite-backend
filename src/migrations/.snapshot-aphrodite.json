@@ -12,6 +12,83 @@
           "nullable": false,
           "mappedType": "integer"
         },
+        "city": {
+          "name": "city",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "address": {
+          "name": "address",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "text"
+        },
+        "is_default": {
+          "name": "is_default",
+          "type": "tinyint(1)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "false",
+          "mappedType": "boolean"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "mappedType": "datetime"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "mappedType": "datetime"
+        }
+      },
+      "name": "address",
+      "indexes": [
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "mappedType": "integer"
+        },
         "name": {
           "name": "name",
           "type": "varchar(255)",
@@ -406,33 +483,42 @@
           "nullable": false,
           "mappedType": "integer"
         },
-        "city": {
-          "name": "city",
+        "address_id": {
+          "name": "address_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "integer"
+        },
+        "status": {
+          "name": "status",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "'new'",
+          "mappedType": "string"
+        },
+        "comment": {
+          "name": "comment",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "text"
+        },
+        "payment_type": {
+          "name": "payment_type",
           "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
           "mappedType": "string"
-        },
-        "address": {
-          "name": "address",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "text"
-        },
-        "is_default": {
-          "name": "is_default",
-          "type": "tinyint(1)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "default": "false",
-          "mappedType": "boolean"
         },
         "updated_at": {
           "name": "updated_at",
@@ -455,14 +541,24 @@
           "mappedType": "datetime"
         }
       },
-      "name": "address",
+      "name": "order",
       "indexes": [
         {
           "columnNames": [
             "user_id"
           ],
           "composite": false,
-          "keyName": "address_user_id_index",
+          "keyName": "order_user_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "address_id"
+          ],
+          "composite": false,
+          "keyName": "order_address_id_index",
           "constraint": false,
           "primary": false,
           "unique": false
@@ -480,16 +576,123 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "address_user_id_foreign": {
-          "constraintName": "address_user_id_foreign",
+        "order_user_id_foreign": {
+          "constraintName": "order_user_id_foreign",
           "columnNames": [
             "user_id"
           ],
-          "localTableName": "address",
+          "localTableName": "order",
           "referencedColumnNames": [
             "id"
           ],
           "referencedTableName": "user",
+          "updateRule": "cascade"
+        },
+        "order_address_id_foreign": {
+          "constraintName": "order_address_id_foreign",
+          "columnNames": [
+            "address_id"
+          ],
+          "localTableName": "order",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "address",
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "order_id": {
+          "name": "order_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "product_id": {
+          "name": "product_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "amount": {
+          "name": "amount",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "1",
+          "mappedType": "integer"
+        }
+      },
+      "name": "order_item",
+      "indexes": [
+        {
+          "columnNames": [
+            "order_id"
+          ],
+          "composite": false,
+          "keyName": "order_item_order_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "product_id"
+          ],
+          "composite": false,
+          "keyName": "order_item_product_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "order_id",
+            "product_id"
+          ],
+          "composite": true,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "order_item_order_id_foreign": {
+          "constraintName": "order_item_order_id_foreign",
+          "columnNames": [
+            "order_id"
+          ],
+          "localTableName": "order_item",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "order",
+          "updateRule": "cascade"
+        },
+        "order_item_product_id_foreign": {
+          "constraintName": "order_item_product_id_foreign",
+          "columnNames": [
+            "product_id"
+          ],
+          "localTableName": "order_item",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "product",
           "updateRule": "cascade"
         }
       },
@@ -576,6 +779,90 @@
           ],
           "referencedTableName": "role",
           "deleteRule": "cascade",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "address_id": {
+          "name": "address_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        }
+      },
+      "name": "user_address",
+      "indexes": [
+        {
+          "columnNames": [
+            "user_id"
+          ],
+          "composite": false,
+          "keyName": "user_address_user_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "address_id"
+          ],
+          "composite": false,
+          "keyName": "user_address_address_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "user_id",
+            "address_id"
+          ],
+          "composite": true,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "user_address_user_id_foreign": {
+          "constraintName": "user_address_user_id_foreign",
+          "columnNames": [
+            "user_id"
+          ],
+          "localTableName": "user_address",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "user",
+          "updateRule": "cascade"
+        },
+        "user_address_address_id_foreign": {
+          "constraintName": "user_address_address_id_foreign",
+          "columnNames": [
+            "address_id"
+          ],
+          "localTableName": "user_address",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "address",
           "updateRule": "cascade"
         }
       },

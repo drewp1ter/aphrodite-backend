@@ -1,37 +1,35 @@
 import { Injectable } from '@nestjs/common'
-import { EntityManager, } from '@mikro-orm/core'
+import { EntityManager } from '@mikro-orm/core'
 import { InjectRepository } from '@mikro-orm/nestjs'
 import { Address } from './address.entity'
-import { AddressRepository } from './address.repository'
 import { CreateAddressDto } from './dto'
+import { User } from '../user/user.entity'
+import { UserRepository } from '../user/user.repository'
+import { UserAddress } from '../user/user-address.entity'
 
 @Injectable()
 export class AddressService {
-
   constructor(
     private readonly em: EntityManager,
-    @InjectRepository(Address)
-    private readonly addressRepository: AddressRepository,
+    @InjectRepository(User)
+    private readonly userRepository: UserRepository
   ) {}
 
   async create(userId: number, dto: CreateAddressDto) {
-    let address
-
-    address = await this.addressRepository.findOne({ city: dto.city, address: dto.address }, { exclude: ['user'] })
-    if (address) {
-      return address.toJSON()
+    const user = await this.userRepository.findOneOrFail(userId, { populate: ['addresses'] })
+    if (!user.addresses.find((address) => address.city === dto.city && address.address === dto.address)) {
+      const address = new Address(dto)
+      user.addresses.add(address)
+      this.em.persistAndFlush(user)
     }
-
-    address = new Address(dto.city, dto.address, dto.isDefault)
-    address.id = await this.addressRepository.insertAndReturnId(userId, address)
-    return address.toJSON()
   }
 
   async findAll(userId: number) {
-    return this.addressRepository.findAllUserAddresses(userId)
+    const result = await this.em.findAll(UserAddress, { where: { user: userId }, populate: ['address'], exclude: ['user'] })
+    return result.map((userAddress) => userAddress.address)
   }
 
   async delete(userId: number, id: number) {
-    return this.addressRepository.nativeDelete({ user: userId, id })
+    return this.em.nativeDelete(UserAddress, { user: userId, address: id })
   }
 }

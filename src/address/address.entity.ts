@@ -1,4 +1,4 @@
-import { Entity, PrimaryKey, EntityRepositoryType, Property, ManyToOne, EntityDTO, wrap, types } from '@mikro-orm/core'
+import { Entity, PrimaryKey, EntityRepositoryType, Property, ManyToMany, Collection, EntityDTO, wrap, types } from '@mikro-orm/core'
 import { User } from '../user/user.entity'
 import { AddressRepository } from './address.repository'
 
@@ -9,30 +9,23 @@ export class Address {
   @PrimaryKey()
   id!: number
 
-  @ManyToOne()
-  user!: User
+  @ManyToMany({ entity: () => User, mappedBy: 'addresses', hidden: true })
+  users = new Collection<User>(this)
 
   @Property()
-  city: string
+  city!: string
 
   @Property({ type: types.text })
-  address: string
-
-  @Property({ default: false })
-  isDefault: boolean
+  address!: string
 
   @Property({ onUpdate: () => new Date() })
-  updatedAt: Date
+  updatedAt = new Date()
 
   @Property()
-  createdAt: Date
+  createdAt = new Date()
 
-  constructor(city: string, address: string, isDefalt: boolean = false) {
-    this.city = city
-    this.address = address
-    this.isDefault = isDefalt
-    this.createdAt = new Date()
-    this.updatedAt = new Date()
+  constructor(partial: Partial<Omit<Address, 'id' | 'users'>>) {
+    Object.assign(this, partial)
   }
 
   toJSON() {
