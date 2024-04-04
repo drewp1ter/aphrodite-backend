@@ -1,55 +1,37 @@
 import { EntityManager } from '@mikro-orm/core'
 import { Seeder } from '@mikro-orm/seeder'
-import { User } from '../../src/user/user.entity'
-import { Address } from '../../src/address/address.entity'
-import { Product } from '../../src/product/product.entity'
-import { ProductGroup } from '../../src/product/product-group.entity'
-
+import { faker } from '@faker-js/faker'
+import { UserFactory } from '../../src/user/user.factory'
+import { AddressFactory } from '../../src/address/address.factory'
+import { ProductFactory, ProductGroupFactory } from '../../src/product/product.factory'
+import { OrderFactory } from '../../src/order/order.factory'
 export class DatabaseSeeder extends Seeder {
   async run(em: EntityManager): Promise<void> {
-    const user = em.create(User, {
-      name: 'John Snow',
-      email: 'snow@wall.st',
-      password: 'snow@wall.st',
-      phone: '+79991234567',
-      createdAt: new Date(),
-      updatedAt: new Date()
-    })
+    const user = new UserFactory(em)
+      .each((user) => {
+        user.addresses.set(new AddressFactory(em).make(3))
+      })
+      .makeOne()
 
-    em.persistAndFlush(user)
+    const productGroups = new ProductGroupFactory(em)
+      .each((productGroup) => {
+        productGroup.products.set(new ProductFactory(em).make(15))
+      })
+      .make(5)
 
-    const address = em.create(Address, {
-      city: 'Los Santos',
-      address: 'Groove Street',
-      createdAt: new Date(),
-      updatedAt: new Date()
-    })
+    new OrderFactory(em)
+      .each(async (order) => {
+        order.user = user
+        order.address = await new AddressFactory(em).createOne()
 
-    em.persistAndFlush(address)
+        for (let i = 0; i < 5; i++) {
+          const groupIdx = faker.number.int({ max: productGroups.length - 1 })
+          const productIdx = faker.number.int({ max: productGroups[groupIdx].products.length - 1 })
+          order.products.add(productGroups[groupIdx].products[productIdx])
+        }
+      })
+      .make(3)
 
-    const productGroup = em.create(ProductGroup, {
-      name: 'Pizza',
-      description: '',
-      createdAt: new Date(),
-      updatedAt: new Date()
-    })
-
-    em.persistAndFlush(productGroup)
-
-    const product = em.create(Product, {
-      group: productGroup,
-      name: 'Pizza',
-      description: 'Tasty Pizza',
-      squirrels: 123,
-      fats: 231,
-      carbohydrates: 555,
-      calories: 150,
-      flags: 0,
-      price: 550,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    })
-
-    em.persistAndFlush(product)
+      await em.flush()
   }
 }

@@ -1,4 +1,5 @@
-import { Entity, PrimaryKey, EntityRepositoryType, Property, ManyToOne, ManyToMany, EntityDTO, Collection, wrap, types } from '@mikro-orm/core'
+import { Entity, EntityRepositoryType, Property, ManyToOne, ManyToMany, EntityDTO, Collection, wrap, types } from '@mikro-orm/core'
+import { BaseEntity } from '../shared/entities/base.entity'
 import { User } from '../user/user.entity'
 import { Product } from '../product/product.entity'
 import { Address } from '../address/address.entity'
@@ -12,11 +13,8 @@ export enum OrderStatus {
 }
 
 @Entity({ repository: () => OrderRepository })
-export class Order {
+export class Order extends BaseEntity {
   [EntityRepositoryType]?: OrderRepository
-
-  @PrimaryKey()
-  id!: number
 
   @ManyToOne({ hidden: true })
   user!: User
@@ -36,17 +34,10 @@ export class Order {
   @Property()
   paymentType!: OrderPaymentType
 
-  @Property({ onUpdate: () => new Date() })
-  updatedAt: Date
-
-  @Property()
-  createdAt: Date
-
   constructor(partial: Pick<Order, 'user' | 'address' | 'comment' | 'paymentType'>) { 
+    super()
     Object.assign(this, partial)
     this.status = OrderStatus.new
-    this.createdAt = new Date()
-    this.updatedAt = new Date()
   }
 
   async toJSON() {

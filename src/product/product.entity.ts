@@ -1,22 +1,19 @@
-import { Entity, PrimaryKey, EntityRepositoryType, Property, ManyToOne, EntityDTO, Index, ManyToMany, Collection, wrap, types } from '@mikro-orm/core'
+import { Entity, EntityRepositoryType, Property, ManyToOne, EntityDTO, ManyToMany, Collection, wrap, types } from '@mikro-orm/core'
+import { BaseEntity } from '../shared/entities/base.entity'
 import { ProductGroup } from './product-group.entity'
 import { Order } from '../order/order.entity'
 import { ProductRepository } from './product.repository'
 @Entity({ repository: () => ProductRepository })
-export class Product {
+export class Product extends BaseEntity {
   [EntityRepositoryType]?: ProductRepository
 
-  @PrimaryKey()
-  id!: number
-
-  @ManyToOne()
+  @ManyToOne({ hidden: true })
   group!: ProductGroup
 
-  @ManyToMany({ entity: () => Order, mappedBy: 'products' })
+  @ManyToMany({ entity: () => Order, mappedBy: 'products', hidden: true })
   orders = new Collection<Order>(this)
 
-  @Property()
-  @Index({ type: 'fulltext' })
+  @Property({ index: 'fulltext' })
   name: string
 
   @Property({ default: '', length: 8192 })
@@ -40,15 +37,10 @@ export class Product {
   @Property({ type: types.float })
   price: number
 
-  @Property({ onUpdate: () => new Date() })
-  updatedAt: Date
-
-  @Property()
-  createdAt: Date
-
   constructor(
     partial: PartialBy<Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'orders'>, 'calories' | 'carbohydrates' | 'flags' | 'fats' | 'squirrels'>
   ) {
+    super()
     this.name = partial.name
     this.description = partial.description
     this.squirrels = partial.squirrels ?? 0
@@ -57,8 +49,6 @@ export class Product {
     this.flags = partial.flags ?? ProductFlags.none
     this.calories = partial.calories ?? 0
     this.price = partial.price
-    this.createdAt = new Date()
-    this.updatedAt = new Date()
   }
 
   toJSON() {

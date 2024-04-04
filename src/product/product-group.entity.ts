@@ -1,28 +1,20 @@
-import { Entity, PrimaryKey, Property, OneToMany, EntityDTO, Index, wrap, Collection } from '@mikro-orm/core'
+import { Entity, Property, OneToMany, EntityDTO, wrap, Collection } from '@mikro-orm/core'
+import { BaseEntity } from '../shared/entities/base.entity'
 import { Product } from './product.entity'
 
 @Entity()
-export class ProductGroup {
-  @PrimaryKey()
-  id!: number
-
-  @OneToMany(() => Product, product => product.group, { orphanRemoval: true })
+export class ProductGroup extends BaseEntity {
+  @OneToMany(() => Product, (product) => product.group, { orphanRemoval: true })
   products = new Collection<Product>(this)
 
-  @Property()
-  @Index({ type: 'fulltext' })
+  @Property({ index: 'fulltext' })
   name: string
 
   @Property({ default: '', length: 8192 })
   description: string
 
-  @Property({ onUpdate: () => new Date() })
-  updatedAt: Date
-
-  @Property()
-  createdAt: Date
-
-  constructor (name: string, description: string) {
+  constructor(name: string, description: string) {
+    super()
     this.name = name
     this.description = description
     this.createdAt = new Date()

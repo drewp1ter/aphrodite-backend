@@ -1,16 +1,14 @@
 import { IsEmail, IsPhoneNumber } from 'class-validator'
 import crypto from 'crypto'
-import { Collection, Entity, EntityDTO, EntityRepositoryType, ManyToMany, PrimaryKey, Property, Unique, wrap } from '@mikro-orm/core'
-import { Role } from '../role/role.entity'
+import { Collection, Entity, EntityDTO, EntityRepositoryType, ManyToMany, Property, wrap } from '@mikro-orm/core'
+import { BaseEntity } from '../shared/entities/base.entity'
 import { Address } from '../address/address.entity'
 import { UserRepository } from './user.repository'
+import { UserAddress } from './user-address.entity'
 
 @Entity({ repository: () => UserRepository })
-export class User {
+export class User extends BaseEntity {
   [EntityRepositoryType]?: UserRepository
-
-  @PrimaryKey()
-  id!: number
 
   @Property()
   name!: string
@@ -19,31 +17,29 @@ export class User {
   @IsEmail()
   email!: string
 
-  @Property()
-  @Unique()
+  @Property({ unique: true })
   @IsPhoneNumber()
   phone!: string
 
   @Property({ hidden: true })
   password: string
 
-  @ManyToMany({ entity: () => Address, pivotEntity: () => Address })
+  @ManyToMany({ entity: () => Address, pivotEntity: () => UserAddress })
   addresses = new Collection<Address>(this)
 
-  @ManyToMany({ entity: () => Role, hidden: true })
-  roles = new Collection<Role>(this)
+  @Property({ hidden: true, default: false })
+  isEmailConfirmed!: boolean
 
-  @Property({ onUpdate: () => new Date() })
-  updatedAt: Date
+  @Property({ hidden: true, default: false })
+  isPhoneConfirmed!: boolean
 
-  @Property()
-  createdAt: Date
+  @Property({ hidden: true, default: false })
+  isAdmin!: boolean
 
   constructor(partial: Partial<Pick<User, 'name' | 'email' | 'password' | 'phone'>>) {
+    super()
     Object.assign(this, partial)
     this.password = partial.password ? crypto.createHmac('sha256', partial.password).digest('hex') : ''
-    this.createdAt = new Date()
-    this.updatedAt = new Date()
   }
 
   toJSON() {

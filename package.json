@@ -87,6 +87,7 @@
     "swagger-ui-express": "^5.0.0"
   },
   "devDependencies": {
+    "@faker-js/faker": "^8.4.1",
     "@mikro-orm/cli": "^6.1.11",
     "@mikro-orm/seeder": "^6.1.11",
     "@nestjs/cli": "^10.3.2",

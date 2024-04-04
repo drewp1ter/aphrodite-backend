@@ -1,13 +1,11 @@
-import { Entity, PrimaryKey, EntityRepositoryType, Property, ManyToMany, Collection, EntityDTO, wrap, types } from '@mikro-orm/core'
+import { Entity, EntityRepositoryType, Property, ManyToMany, Collection, EntityDTO, wrap, types } from '@mikro-orm/core'
+import { BaseEntity } from '../shared/entities/base.entity'
 import { User } from '../user/user.entity'
 import { AddressRepository } from './address.repository'
 
 @Entity({ repository: () => AddressRepository })
-export class Address {
+export class Address extends BaseEntity {
   [EntityRepositoryType]?: AddressRepository
-
-  @PrimaryKey()
-  id!: number
 
   @ManyToMany({ entity: () => User, mappedBy: 'addresses', hidden: true })
   users = new Collection<User>(this)
@@ -18,13 +16,8 @@ export class Address {
   @Property({ type: types.text })
   address!: string
 
-  @Property({ onUpdate: () => new Date() })
-  updatedAt = new Date()
-
-  @Property()
-  createdAt = new Date()
-
   constructor(partial: Partial<Omit<Address, 'id' | 'users'>>) {
+    super()
     Object.assign(this, partial)
   }
 
