@@ -19,10 +19,8 @@ export class DatabaseSeeder extends Seeder {
     em.persistAndFlush(user)
 
     const address = em.create(Address, {
-      user,
       city: 'Los Santos',
       address: 'Groove Street',
-      isDefault: false,
       createdAt: new Date(),
       updatedAt: new Date()
     })

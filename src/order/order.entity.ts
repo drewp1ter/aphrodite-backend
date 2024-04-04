@@ -18,23 +18,23 @@ export class Order {
   @PrimaryKey()
   id!: number
 
-  @ManyToOne()
-  user: User
+  @ManyToOne({ hidden: true })
+  user!: User
 
-  @ManyToOne({ nullable: true })
-  address: Address | null
+  @ManyToOne({ nullable: true, hidden: true })
+  address!: Address | null
 
-  @ManyToMany({ entity: () => Product, pivotEntity: () => OrderItem })
+  @ManyToMany({ entity: () => Product, pivotEntity: () => OrderItem, hidden: true })
   products = new Collection<Product>(this)
 
-  @Property({ default: OrderStatus.new })
+  @Property({ default: OrderStatus.new, hidden: true })
   status: OrderStatus
 
   @Property({ type: types.text, nullable: true })
-  comment: string
+  comment!: string
 
   @Property()
-  paymentType: OrderPaymentType
+  paymentType!: OrderPaymentType
 
   @Property({ onUpdate: () => new Date() })
   updatedAt: Date
@@ -42,18 +42,16 @@ export class Order {
   @Property()
   createdAt: Date
 
-  constructor(user: User, address: Address | null, comment: string, paymentType: OrderPaymentType) {
-    this.user = user
-    this.address = address
+  // constructor(user: User, address: Address | null, comment: string, paymentType: OrderPaymentType) {
+  constructor(partial: Pick<Order, 'user' | 'address' | 'comment' | 'paymentType'>) { 
+    Object.assign(this, partial)
     this.status = OrderStatus.new
-    this.comment = comment
-    this.paymentType = paymentType
     this.createdAt = new Date()
     this.updatedAt = new Date()
   }
 
-  toJSON() {
-    const order = wrap<Order>(this).toObject() as OrderDto
+  async toJSON() {
+    return wrap<Order>(this).toObject() as OrderDto
   }
 }
 

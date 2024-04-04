@@ -6,9 +6,9 @@ import { Address } from '../address/address.entity'
 import { AddressRepository } from '../address/address.repository'
 import { User } from '../user/user.entity'
 import { Order } from './order.entity'
-import { OrderRepository } from './order.repository'
 import { CreateOrderDto } from './dto/create-order.dto'
 import { OrderItem } from './order-item.entity'
+import { UserAddress } from '../user/user-address.entity'
 
 @Injectable()
 export class OrderService {
@@ -17,27 +17,19 @@ export class OrderService {
     @InjectRepository(User)
     private readonly userRepository: UserRepository,
     @InjectRepository(Address)
-    private readonly addressRepository: AddressRepository,
-    @InjectRepository(Order)
-    private readonly orderRepository: OrderRepository
+    private readonly addressRepository: AddressRepository
   ) {}
 
   async create(dto: CreateOrderDto) {
     return this.em.transactional(async (em: EntityManager) => {
       let user = await this.userRepository.findOne({ phone: dto.phone })
-      if (!user) {
-        user = new User(dto.name, '', dto.phone)
-        await em.persistAndFlush(user)
-      }
+      user ??= new User({ name: dto.name, phone: dto.phone })
 
-      let address = await this.addressRepository.findOne({ user, city: dto.address.city, address: dto.address.address })
-      if (!address) {
-        address = new Address(user, dto.address.city, dto.address.address)
-        await em.persistAndFlush(address)
-      }
+      let address = await this.addressRepository.findOne({ city: dto.address.city, address: dto.address.address })
+      address ??= new Address(dto.address)
 
-      const order = new Order(user, address, dto.comment, dto.paymentType)
-      await em.persistAndFlush(order)
+      const order = new Order({ user, address, comment: dto.comment, paymentType: dto.paymentType })
+      em.persist(user).persist(address).persist(order)
 
       for (const item of dto.items) {
         const orderItem = em.create(OrderItem, {
@@ -49,6 +41,12 @@ export class OrderService {
       }
 
       await em.flush()
+
+      let userAddress = await em.findOne(UserAddress, { user, address })
+      if (!userAddress) {
+        userAddress = em.create(UserAddress, { user, address })
+        await em.persistAndFlush(userAddress)
+      }
 
       return order.toJSON()
     })
