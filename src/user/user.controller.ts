@@ -3,7 +3,7 @@ import { UniqueConstraintViolationException } from '@mikro-orm/mysql'
 import { ValidationPipe } from '../shared/pipes/validation.pipe'
 import { CreateUserDto, LoginUserDto, UpdateUserDto } from './dto'
 import { User } from './user.decorator'
-import { IUserRO } from './user.interface'
+import { IUserData } from './user.interface'
 import { UserService } from './user.service'
 
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
@@ -15,8 +15,8 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get('user')
-  async findMe(@User('email') email: string): Promise<IUserRO> {
-    return this.userService.findByEmail(email)
+  async findMe(@User('id') userId: number): Promise<IUserData> {
+    return this.userService.findById(userId)
   }
 
   @Put('user')
@@ -43,7 +43,7 @@ export class UserController {
 
   @UsePipes(new ValidationPipe())
   @Post('users/login')
-  async login(@Body('user') loginUserDto: LoginUserDto): Promise<IUserRO> {
+  async login(@Body('user') loginUserDto: LoginUserDto): Promise<IUserData> {
     const foundUser = await this.userService.findOne(loginUserDto)
 
     const errors = { User: ' not found' }
@@ -53,6 +53,6 @@ export class UserController {
     const token = await this.userService.generateJWT(foundUser)
     const { email, name, phone, id } = foundUser
     const user = { email, token, name, phone, id }
-    return { user }
+    return user
   }
 }

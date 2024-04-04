@@ -1,6 +1,6 @@
 import { IsEmail, IsPhoneNumber } from 'class-validator'
 import crypto from 'crypto'
-import { Collection, Entity, EntityDTO, EntityRepositoryType, ManyToMany, OneToMany, PrimaryKey, Property, Unique, wrap } from '@mikro-orm/core'
+import { Collection, Entity, EntityDTO, EntityRepositoryType, ManyToMany, PrimaryKey, Property, Unique, wrap } from '@mikro-orm/core'
 import { Role } from '../role/role.entity'
 import { Address } from '../address/address.entity'
 import { UserRepository } from './user.repository'
@@ -30,7 +30,7 @@ export class User {
   @ManyToMany({ entity: () => Address, pivotEntity: () => Address })
   addresses = new Collection<Address>(this)
 
-  @ManyToMany(() => Role)
+  @ManyToMany({ entity: () => Role, hidden: true })
   roles = new Collection<Role>(this)
 
   @Property({ onUpdate: () => new Date() })
@@ -46,9 +46,8 @@ export class User {
     this.updatedAt = new Date()
   }
 
-  toJSON(user?: User) {
+  toJSON() {
     const o = wrap<User>(this).toObject() as UserDTO
-
     return o
   }
 }

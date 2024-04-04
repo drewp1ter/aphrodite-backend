@@ -42,7 +42,6 @@ export class Order {
   @Property()
   createdAt: Date
 
-  // constructor(user: User, address: Address | null, comment: string, paymentType: OrderPaymentType) {
   constructor(partial: Pick<Order, 'user' | 'address' | 'comment' | 'paymentType'>) { 
     Object.assign(this, partial)
     this.status = OrderStatus.new

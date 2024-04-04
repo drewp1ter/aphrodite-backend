@@ -6,16 +6,12 @@ import { EntityManager, wrap } from '@mikro-orm/core'
 import { SECRET } from '../config'
 import { CreateUserDto, LoginUserDto, UpdateUserDto } from './dto'
 import { User } from './user.entity'
-import { IUserRO } from './user.interface'
+import { IUserData } from './user.interface'
 import { UserRepository } from './user.repository'
 
 @Injectable()
 export class UserService {
   constructor(private readonly userRepository: UserRepository, private readonly em: EntityManager) {}
-
-  async findAll(): Promise<User[]> {
-    return this.userRepository.findAll()
-  }
 
   async findOne(loginUserDto: LoginUserDto): Promise<User | null> {
     const findOneOptions = {
@@ -26,7 +22,7 @@ export class UserService {
     return this.userRepository.findOne(findOneOptions)
   }
 
-  async create(dto: CreateUserDto): Promise<IUserRO> {
+  async create(dto: CreateUserDto): Promise<IUserData> {
     const { name, email, password, phone } = dto
     const exists = await this.userRepository.findOne({ email })
 
@@ -69,7 +65,7 @@ export class UserService {
     return this.userRepository.nativeDelete({ email })
   }
 
-  async findById(id: number): Promise<IUserRO> {
+  async findById(id: number): Promise<IUserData> {
     const user = await this.userRepository.findOne(id)
 
     if (!user) {
@@ -77,11 +73,6 @@ export class UserService {
       throw new HttpException({ errors }, 401)
     }
 
-    return this.buildUserRO(user)
-  }
-
-  async findByEmail(email: string): Promise<IUserRO> {
-    const user = await this.userRepository.findOneOrFail({ email })
     return this.buildUserRO(user)
   }
 
@@ -99,14 +90,13 @@ export class UserService {
     )
   }
 
-  private buildUserRO(user: User) {
-    const userRO = {
+  private buildUserRO(user: User): IUserData {
+    return {
+      id: user.id,
       email: user.email,
       phone: user.phone,
       token: this.generateJWT(user),
       name: user.name
-    } as any
-
-    return { user: userRO }
+    }
   }
 }

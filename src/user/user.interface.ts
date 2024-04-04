@@ -5,7 +5,3 @@ export interface IUserData {
   token: string
   name: string
 }
-
-export interface IUserRO {
-  user: IUserData
-}
