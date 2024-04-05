@@ -1,14 +1,14 @@
 import { Entity, EntityRepositoryType, Property, ManyToOne, EntityDTO, ManyToMany, Collection, wrap, types } from '@mikro-orm/core'
-import { BaseEntity } from '../shared/entities/base.entity'
-import { ProductGroup } from './product-group.entity'
-import { Order } from '../order/order.entity'
+import { BaseEntity } from '../../shared/entities/base.entity'
+import { Category } from '../category.entity'
+import { Order } from '../../order/order.entity'
 import { ProductRepository } from './product.repository'
 @Entity({ repository: () => ProductRepository })
 export class Product extends BaseEntity {
   [EntityRepositoryType]?: ProductRepository
 
   @ManyToOne({ hidden: true })
-  group!: ProductGroup
+  category!: Category
 
   @ManyToMany({ entity: () => Order, mappedBy: 'products', hidden: true })
   orders = new Collection<Order>(this)

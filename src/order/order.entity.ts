@@ -1,7 +1,7 @@
 import { Entity, EntityRepositoryType, Property, ManyToOne, ManyToMany, EntityDTO, Collection, wrap, types } from '@mikro-orm/core'
 import { BaseEntity } from '../shared/entities/base.entity'
 import { User } from '../user/user.entity'
-import { Product } from '../product/product.entity'
+import { Product } from '../category/product/product.entity'
 import { Address } from '../address/address.entity'
 import { OrderItem } from './order-item.entity'
 import { OrderRepository } from './order.repository'

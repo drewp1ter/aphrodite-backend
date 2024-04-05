@@ -120,7 +120,7 @@
           "mappedType": "string"
         }
       },
-      "name": "product_group",
+      "name": "category",
       "indexes": [
         {
           "columnNames": [
@@ -178,8 +178,8 @@
           "length": 0,
           "mappedType": "datetime"
         },
-        "group_id": {
-          "name": "group_id",
+        "category_id": {
+          "name": "category_id",
           "type": "int",
           "unsigned": true,
           "autoincrement": false,
@@ -271,10 +271,10 @@
       "indexes": [
         {
           "columnNames": [
-            "group_id"
+            "category_id"
           ],
           "composite": false,
-          "keyName": "product_group_id_index",
+          "keyName": "product_category_id_index",
           "constraint": false,
           "primary": false,
           "unique": false
@@ -302,16 +302,16 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "product_group_id_foreign": {
-          "constraintName": "product_group_id_foreign",
+        "product_category_id_foreign": {
+          "constraintName": "product_category_id_foreign",
           "columnNames": [
-            "group_id"
+            "category_id"
           ],
           "localTableName": "product",
           "referencedColumnNames": [
             "id"
           ],
-          "referencedTableName": "product_group",
+          "referencedTableName": "category",
           "updateRule": "cascade"
         }
       },

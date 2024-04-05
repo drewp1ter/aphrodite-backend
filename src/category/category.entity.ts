@@ -1,10 +1,10 @@
 import { Entity, Property, OneToMany, EntityDTO, wrap, Collection } from '@mikro-orm/core'
 import { BaseEntity } from '../shared/entities/base.entity'
-import { Product } from './product.entity'
+import { Product } from './product/product.entity'
 
 @Entity()
-export class ProductGroup extends BaseEntity {
-  @OneToMany(() => Product, (product) => product.group, { orphanRemoval: true })
+export class Category extends BaseEntity {
+  @OneToMany(() => Product, (product) => product.category, { orphanRemoval: true })
   products = new Collection<Product>(this)
 
   @Property({ index: 'fulltext' })
@@ -22,8 +22,8 @@ export class ProductGroup extends BaseEntity {
   }
 
   toJSON() {
-    return wrap<ProductGroup>(this).toObject() as ProductGroupDto
+    return wrap<Category>(this).toObject() as CategoryDto
   }
 }
 
-export interface ProductGroupDto extends EntityDTO<ProductGroup> {}
+export interface CategoryDto extends EntityDTO<Category> {}

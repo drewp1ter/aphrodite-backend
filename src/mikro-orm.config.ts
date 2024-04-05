@@ -22,7 +22,7 @@ export default defineConfig({
   registerRequestContext: false,
   extensions: [Migrator, EntityGenerator, SeedManager],
   seeder: {
-    path: './database/seeder',
+    path: './src/seeder',
     pathTs: undefined,
     defaultSeeder: 'DatabaseSeeder',
     glob: '!(*.d).{js,ts}',
