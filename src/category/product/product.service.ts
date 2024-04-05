@@ -13,10 +13,13 @@ export class ProductService {
   ) {}
 
   async findByCategoryId(categotyId: number) {
-    return this.productRepository.findAll({ where: { category: categotyId } })
+    return this.productRepository.findAll({ where: { category: categotyId }, populate: ['images'] })
   }
 
   async find(query: string) {
-    return this.productRepository.findAll({ where: { $or: [{ name: { $fulltext: query } }, { category: { name: { $fulltext: query } } }] } })
+    return this.productRepository.findAll({
+      where: { $or: [{ name: { $fulltext: query } }, { category: { name: { $fulltext: query } } }] },
+      populate: ['images']
+    })
   }
 }

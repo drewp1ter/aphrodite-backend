@@ -1,8 +1,10 @@
-import { Entity, EntityRepositoryType, Property, ManyToOne, EntityDTO, ManyToMany, Collection, wrap, Index, types } from '@mikro-orm/core'
+import { Entity, EntityRepositoryType, Property, ManyToOne, EntityDTO, ManyToMany, Collection, wrap, Index, types, OneToMany } from '@mikro-orm/core'
 import { BaseEntity } from '../../shared/entities/base.entity'
 import { Category } from '../category.entity'
 import { Order } from '../../order/order.entity'
 import { ProductRepository } from './product.repository'
+import { ProductImage } from './product-image/product-image.entity'
+
 @Entity({ repository: () => ProductRepository })
 export class Product extends BaseEntity {
   [EntityRepositoryType]?: ProductRepository
@@ -12,6 +14,9 @@ export class Product extends BaseEntity {
 
   @ManyToMany({ entity: () => Order, mappedBy: 'products', hidden: true })
   orders = new Collection<Order>(this)
+
+  @OneToMany(() => ProductImage, image => image.product, { orphanRemoval: true })
+  images = new Collection<ProductImage>(this)
 
   @Property()
   @Index({ type: 'fulltext' })

@@ -7,7 +7,7 @@ export class ProductFactory extends Factory<Product> {
 
   definition(): Partial<Product> {
     return {
-      name: faker.commerce.product(),
+      name: faker.commerce.productName(),
       description: faker.commerce.productDescription(),
       price: parseFloat(faker.commerce.price({ min: 10, max: 2000 })),
       squirrels: faker.number.int({ max: 1000 }),
