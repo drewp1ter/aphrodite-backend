@@ -123,14 +123,15 @@
       "name": "category",
       "indexes": [
         {
+          "keyName": "category_name_index",
           "columnNames": [
             "name"
           ],
           "composite": false,
-          "keyName": "fulltext",
           "constraint": false,
           "primary": false,
-          "unique": false
+          "unique": false,
+          "type": "fulltext"
         },
         {
           "keyName": "PRIMARY",
@@ -280,14 +281,15 @@
           "unique": false
         },
         {
+          "keyName": "product_name_index",
           "columnNames": [
             "name"
           ],
           "composite": false,
-          "keyName": "fulltext",
           "constraint": false,
           "primary": false,
-          "unique": false
+          "unique": false,
+          "type": "fulltext"
         },
         {
           "keyName": "PRIMARY",

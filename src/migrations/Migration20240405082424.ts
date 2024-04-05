@@ -1,16 +1,16 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20240405074648 extends Migration {
+export class Migration20240405082424 extends Migration {
 
   async up(): Promise<void> {
     this.addSql('create table `address` (`id` int unsigned not null auto_increment primary key, `created_at` datetime not null, `updated_at` datetime not null, `city` varchar(255) not null, `address` text not null) default character set utf8mb4 engine = InnoDB;');
 
     this.addSql('create table `category` (`id` int unsigned not null auto_increment primary key, `created_at` datetime not null, `updated_at` datetime not null, `name` varchar(255) not null, `description` varchar(8192) not null default \'\') default character set utf8mb4 engine = InnoDB;');
-    this.addSql('alter table `category` add index `fulltext`(`name`);');
+    this.addSql('alter table `category` add fulltext index `category_name_index`(`name`);');
 
     this.addSql('create table `product` (`id` int unsigned not null auto_increment primary key, `created_at` datetime not null, `updated_at` datetime not null, `category_id` int unsigned not null, `name` varchar(255) not null, `description` varchar(8192) not null default \'\', `squirrels` float not null default 0, `fats` float not null default 0, `carbohydrates` float not null default 0, `flags` smallint not null default 0, `calories` int not null default 0, `price` float not null) default character set utf8mb4 engine = InnoDB;');
     this.addSql('alter table `product` add index `product_category_id_index`(`category_id`);');
-    this.addSql('alter table `product` add index `fulltext`(`name`);');
+    this.addSql('alter table `product` add fulltext index `product_name_index`(`name`);');
 
     this.addSql('create table `user` (`id` int unsigned not null auto_increment primary key, `created_at` datetime not null, `updated_at` datetime not null, `name` varchar(255) not null, `email` varchar(255) not null default \'\', `phone` varchar(255) not null, `password` varchar(255) not null, `is_email_confirmed` tinyint(1) not null default false, `is_phone_confirmed` tinyint(1) not null default false, `is_admin` tinyint(1) not null default false) default character set utf8mb4 engine = InnoDB;');
     this.addSql('alter table `user` add unique `user_phone_unique`(`phone`);');

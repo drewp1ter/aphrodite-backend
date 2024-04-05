@@ -1,4 +1,4 @@
-import { Entity, Property, OneToMany, EntityDTO, wrap, Collection } from '@mikro-orm/core'
+import { Entity, Property, OneToMany, EntityDTO, wrap, Collection, Index } from '@mikro-orm/core'
 import { BaseEntity } from '../shared/entities/base.entity'
 import { Product } from './product/product.entity'
 
@@ -7,7 +7,8 @@ export class Category extends BaseEntity {
   @OneToMany(() => Product, (product) => product.category, { orphanRemoval: true })
   products = new Collection<Product>(this)
 
-  @Property({ index: 'fulltext' })
+  @Property()
+  @Index({ type: 'fulltext' })
   name: string
 
   @Property({ default: '', length: 8192 })

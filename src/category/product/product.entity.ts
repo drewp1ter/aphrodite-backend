@@ -1,4 +1,4 @@
-import { Entity, EntityRepositoryType, Property, ManyToOne, EntityDTO, ManyToMany, Collection, wrap, types } from '@mikro-orm/core'
+import { Entity, EntityRepositoryType, Property, ManyToOne, EntityDTO, ManyToMany, Collection, wrap, Index, types } from '@mikro-orm/core'
 import { BaseEntity } from '../../shared/entities/base.entity'
 import { Category } from '../category.entity'
 import { Order } from '../../order/order.entity'
@@ -13,7 +13,8 @@ export class Product extends BaseEntity {
   @ManyToMany({ entity: () => Order, mappedBy: 'products', hidden: true })
   orders = new Collection<Order>(this)
 
-  @Property({ index: 'fulltext' })
+  @Property()
+  @Index({ type: 'fulltext' })
   name: string
 
   @Property({ default: '', length: 8192 })
