@@ -19,49 +19,6 @@
     "test:coverage": "jest --config=jest.json --coverage --coverageDirectory=coverage",
     "test:e2e": "APIURL=http://localhost:3000/api ./e2e/run-api-tests.sh"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/mikro-orm/nestjs-realworld-example-app.git"
-  },
-  "author": "banan23@gmail.com",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/mikro-orm/nestjs-realworld-example-app/issues"
-  },
-  "homepage": "https://github.com/mikro-orm/nestjs-realworld-example-app#readme",
-  "renovate": {
-    "extends": [
-      "config:base",
-      ":preserveSemverRanges",
-      ":semanticCommitTypeAll(chore)"
-    ],
-    "semanticCommits": "enabled",
-    "separateMajorMinor": false,
-    "dependencyDashboard": false,
-    "lockFileMaintenance": {
-      "enabled": true,
-      "schedule": [
-        "before 2am"
-      ],
-      "automerge": true,
-      "automergeType": "branch"
-    },
-    "packageRules": [
-      {
-        "matchUpdateTypes": [
-          "patch",
-          "minor"
-        ],
-        "groupName": "patch/minor dependencies",
-        "groupSlug": "all-non-major",
-        "automerge": true,
-        "automergeType": "branch"
-      }
-    ],
-    "schedule": [
-      "every weekday"
-    ]
-  },
   "dependencies": {
     "@mikro-orm/core": "^6.1.11",
     "@mikro-orm/entity-generator": "^6.1.11",
