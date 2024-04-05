@@ -7,7 +7,7 @@ export class CategoryFactory extends Factory<Category> {
 
   definition(): Partial<Category> {
     return {
-      name: faker.commerce.productName(),
+      name: faker.commerce.product(),
       description: faker.commerce.productDescription()
     }
   }

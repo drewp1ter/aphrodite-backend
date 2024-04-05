@@ -52,7 +52,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"user\":{\"email\":\"admin2@gmail.com\", \"password\":\"password13245678\", \"name\":\"admin2\", \"phone\": \"+79991234567\"}}"
+							"raw": "{\"user\":{\"email\":\"admin2@gmail.com\", \"password\":\"password13245678\", \"name\":\"admin2\", \"phone\": \"+79991234566\"}}"
 						},
 						"url": {
 							"raw": "{{APIURL}}/api/users",
@@ -200,7 +200,8 @@
 									"tests['User has \"token\" property'] = user.hasOwnProperty('token');",
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -221,11 +222,12 @@
 							}
 						],
 						"url": {
-							"raw": "{{APIURL}}/user",
+							"raw": "{{APIURL}}/api/user",
 							"host": [
 								"{{APIURL}}"
 							],
 							"path": [
+								"api",
 								"user"
 							]
 						}
@@ -381,18 +383,63 @@
 			"name": "Product",
 			"item": [
 				{
-					"name": "Get products",
+					"name": "Get products groups",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{APIURL}}/api/products",
+							"raw": "{{APIURL}}/api/products?query=pizza",
 							"host": [
 								"{{APIURL}}"
 							],
 							"path": [
 								"api",
 								"products"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "pizza"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get products by category id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{APIURL}}/api/categories/1/products",
+							"host": [
+								"{{APIURL}}"
+							],
+							"path": [
+								"api",
+								"categories",
+								"1",
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get categories",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{APIURL}}/api/categories/",
+							"host": [
+								"{{APIURL}}"
+							],
+							"path": [
+								"api",
+								"categories",
+								""
 							]
 						}
 					},
@@ -410,7 +457,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"phone\": \"+79910000000\",\n    \"name\": \"John Doe\",\n    \"comment\": \"some comment\",\n    \"oaymentType\": \"cash\",\n    \"address\": {\n        \"city\": \"city 17\",\n        \"address\": \"Black mesa\"\n    },\n    \"items\": {\n        \"productId\": 1,\n        \"amount\": 2\n    }\n}",
+							"raw": "{\n    \"phone\": \"+79910000041\",\n    \"name\": \"John Doe\",\n    \"comment\": \"some comment\",\n    \"paymentType\": \"cash\",\n    \"address\": {\n        \"city\": \"city 172\",\n        \"address\": \"Black mesa\"\n    },\n    \"items\": [\n        {\n            \"productId\": 1,\n            \"amount\": 2\n        }\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -418,13 +465,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{APIURL}}/api/",
+							"raw": "{{APIURL}}/api/orders",
 							"host": [
 								"{{APIURL}}"
 							],
 							"path": [
 								"api",
-								""
+								"orders"
 							]
 						}
 					},

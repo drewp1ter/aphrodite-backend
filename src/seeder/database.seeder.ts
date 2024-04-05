@@ -6,6 +6,7 @@ import { AddressFactory } from '../address/address.factory'
 import { ProductFactory } from '../category/product/product.factory'
 import { CategoryFactory } from '../category/category.factory'
 import { OrderFactory } from '../order/order.factory'
+import { ProductImageFactory } from '../category/product/product-image/product-image.factory'
 
 export class DatabaseSeeder extends Seeder {
   async run(em: EntityManager): Promise<void> {
@@ -17,7 +18,13 @@ export class DatabaseSeeder extends Seeder {
 
     const category = new CategoryFactory(em)
       .each((category) => {
-        category.products.set(new ProductFactory(em).make(15))
+        category.products.set(
+          new ProductFactory(em)
+            .each((product) => {
+              product.images.add(new ProductImageFactory(em).makeOne())
+            })
+            .make(15)
+        )
       })
       .make(5)
 
@@ -33,6 +40,6 @@ export class DatabaseSeeder extends Seeder {
       })
       .make(3)
 
-      await em.flush()
+    await em.flush()
   }
 }
