@@ -4,4 +4,5 @@ export interface IUserData {
   phone?: string
   token: string
   name: string
+  roles?: string[]
 }

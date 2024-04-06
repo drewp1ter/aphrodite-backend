@@ -6,6 +6,8 @@ import { EntityManager, wrap } from '@mikro-orm/core'
 import { SECRET } from '../config'
 import { CreateUserDto, LoginUserDto, UpdateUserDto } from './dto'
 import { User } from './user.entity'
+import { Role } from './role/role.entity'
+import { Role as RoleEnum } from './role/role.enum'
 import { IUserData } from './user.interface'
 import { UserRepository } from './user.repository'
 
@@ -24,21 +26,12 @@ export class UserService {
 
   async create(dto: CreateUserDto): Promise<IUserData> {
     const { name, email, password, phone } = dto
-    const exists = await this.userRepository.findOne({ email })
-
-    if (exists) {
-      throw new HttpException(
-        {
-          message: 'Input data validation failed',
-          errors: { name: 'Email must be unique.' }
-        },
-        HttpStatus.BAD_REQUEST
-      )
-    }
 
     const user = new User({ name, password, phone, email })
-    const errors = await validate(user)
+    const roleUser = await this.em.findOneOrFail(Role, { role: RoleEnum.User })
+    user.roles.add(roleUser)
 
+    const errors = await validate(user)
     if (errors.length > 0) {
       throw new HttpException(
         {
@@ -96,7 +89,8 @@ export class UserService {
       email: user.email,
       phone: user.phone,
       token: this.generateJWT(user),
-      name: user.name
+      name: user.name,
+      roles: user.roles.getItems().map(item => item.role)
     }
   }
 }

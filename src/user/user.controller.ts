@@ -19,6 +19,7 @@ export class UserController {
     return this.userService.findById(userId)
   }
 
+  @UsePipes(new ValidationPipe())
   @Put('user')
   async update(@User('id') userId: number, @Body('user') userData: UpdateUserDto) {
     return this.userService.update(userId, userData)
