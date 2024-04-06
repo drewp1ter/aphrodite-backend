@@ -51,9 +51,7 @@ export class UserController {
     if (!foundUser) {
       throw new HttpException({ errors }, 401)
     }
-    const token = await this.userService.generateJWT(foundUser)
-    const { email, name, phone, id } = foundUser
-    const user = { email, token, name, phone, id }
-    return user
+
+    return this.userService.buildUserRO(foundUser)
   }
 }

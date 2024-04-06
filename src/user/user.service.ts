@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { validate } from 'class-validator'
 import crypto from 'crypto'
 import jwt from 'jsonwebtoken'
+import { JwtService } from '@nestjs/jwt'
 import { EntityManager, wrap } from '@mikro-orm/core'
 import { SECRET } from '../config'
 import { CreateUserDto, LoginUserDto, UpdateUserDto } from './dto'
@@ -13,7 +14,7 @@ import { UserRepository } from './user.repository'
 
 @Injectable()
 export class UserService {
-  constructor(private readonly userRepository: UserRepository, private readonly em: EntityManager) {}
+  constructor(private readonly userRepository: UserRepository, private readonly em: EntityManager, private jwtService: JwtService) {}
 
   async findOne(loginUserDto: LoginUserDto): Promise<User | null> {
     const findOneOptions = {
@@ -69,26 +70,13 @@ export class UserService {
     return this.buildUserRO(user)
   }
 
-  generateJWT(user) {
-    const today = new Date()
-    const exp = new Date(today)
-    exp.setDate(today.getDate() + 60)
-
-    return jwt.sign(
-      {
-        exp: exp.getTime() / 1000,
-        id: user.id
-      },
-      SECRET
-    )
-  }
-
-  private buildUserRO(user: User): IUserData {
+  async buildUserRO(user: User): Promise<IUserData> {
+    const jwtPayload = { id: user.id, roles: user.roles.map(role => role.role) }
     return {
       id: user.id,
       email: user.email,
       phone: user.phone,
-      token: this.generateJWT(user),
+      token: await this.jwtService.signAsync(jwtPayload),
       name: user.name,
       roles: user.roles.getItems().map(item => item.role)
     }

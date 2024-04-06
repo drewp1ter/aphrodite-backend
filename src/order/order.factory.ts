@@ -1,6 +1,7 @@
 import { Factory } from '@mikro-orm/seeder'
 import { faker } from '@faker-js/faker'
 import { Order } from './order.entity'
+import { OrderPaymentType } from './order.entity'
 
 export class OrderFactory extends Factory<Order> {
   model = Order

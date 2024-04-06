@@ -1,9 +1,12 @@
-import { Entity, Property, OneToMany, EntityDTO, wrap, Collection, Index } from '@mikro-orm/core'
+import { Entity, Property, OneToMany, EntityDTO, wrap, Collection, Index, EntityRepositoryType } from '@mikro-orm/core'
 import { BaseEntity } from '../shared/entities/base.entity'
 import { Product } from './product/product.entity'
+import { CategoryRepository } from './category.repository'
 
-@Entity()
+@Entity({ repository: () => CategoryRepository })
 export class Category extends BaseEntity {
+  [EntityRepositoryType]?: CategoryRepository
+  
   constructor(name: string, description: string) {
     super()
     this.name = name

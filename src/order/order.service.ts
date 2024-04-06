@@ -10,17 +10,17 @@ import { CreateOrderDto } from './dto/create-order.dto'
 import { OrderItem } from './order-item.entity'
 import { UserAddress } from '../user/user-address.entity'
 import { OrderRepository } from './order.repository'
-
+import { OrderStatus } from './order.entity'
 @Injectable()
 export class OrderService {
   constructor(
     private readonly em: EntityManager,
+    @InjectRepository(Order)
+    private readonly orderRepository: OrderRepository,
     @InjectRepository(User)
     private readonly userRepository: UserRepository,
     @InjectRepository(Address)
-    private readonly addressRepository: AddressRepository,
-    @InjectRepository(OrderRepository)
-    private readonly orderRepository: OrderRepository
+    private readonly addressRepository: AddressRepository
   ) {}
 
   async create(dto: CreateOrderDto) {

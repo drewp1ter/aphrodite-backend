@@ -11,6 +11,7 @@ export class AuthMiddleware implements NestMiddleware {
 
   async use(req: Request & { user?: IUserData & { id?: number } }, res: Response, next: NextFunction) {
     const authHeaders = req.headers.authorization
+    console.log('auth middlewaer')
     if (authHeaders && (authHeaders as string).split(' ')[1]) {
       const token = (authHeaders as string).split(' ')[1]
       const decoded: any = jwt.verify(token, SECRET)

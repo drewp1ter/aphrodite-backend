@@ -5,6 +5,19 @@ import { Product } from '../category/product/product.entity'
 import { Address } from '../address/address.entity'
 import { OrderItem } from './order-item.entity'
 import { OrderRepository } from './order.repository'
+
+export enum OrderPaymentType {
+  Cash = 'cash',
+  Online = 'online'
+}
+
+export enum OrderStatus {
+  New = 'new',
+  Payed = 'payed',
+  Canceled = 'canceled',
+  Confirmed = 'confirmed'
+}
+
 @Entity({ repository: () => OrderRepository })
 export class Order extends BaseEntity {
   [EntityRepositoryType]?: OrderRepository
@@ -35,6 +48,11 @@ export class Order extends BaseEntity {
 
   @Property({ default: '' })
   confirmationToken!: string
+
+  @Property({ persist: false })
+  get total() {
+    return this.products.reduce((acc, product) => acc + product.price, 0)
+  }
 
   async toJSON() {
     return wrap<Order>(this).toObject() as OrderDto
