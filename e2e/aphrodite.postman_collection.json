@@ -52,7 +52,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"user\":{\"email\":\"admin2@gmail.com\", \"password\":\"password13245678\", \"name\":\"admin2\", \"phone\": \"+79991234566\"}}"
+							"raw": "{\"user\":{\"email\":\"admin2@gmail.com\", \"password\":\"password13245678\", \"name\":\"admin\", \"phone\": \"+79991234566\"}}"
 						},
 						"url": {
 							"raw": "{{APIURL}}/api/users",
@@ -383,7 +383,7 @@
 			"name": "Product",
 			"item": [
 				{
-					"name": "Get products groups",
+					"name": "search products",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -430,7 +430,14 @@
 					"name": "get categories",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
 						"url": {
 							"raw": "{{APIURL}}/api/categories/",
 							"host": [
