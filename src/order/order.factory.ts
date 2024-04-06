@@ -1,6 +1,6 @@
 import { Factory } from '@mikro-orm/seeder'
 import { faker } from '@faker-js/faker'
-import { Order, OrderPaymentType } from './order.entity'
+import { Order } from './order.entity'
 
 export class OrderFactory extends Factory<Order> {
   model = Order
@@ -8,7 +8,7 @@ export class OrderFactory extends Factory<Order> {
   definition(): Partial<Order> {
     return {
       comment: faker.lorem.words({ min: 0, max: 20 }),
-      paymentType: [OrderPaymentType.cash, OrderPaymentType.online][faker.number.int({ max: 1 })]
+      paymentType: [OrderPaymentType.Cash, OrderPaymentType.Online][faker.number.int({ max: 1 })]
     }
   }
 }
