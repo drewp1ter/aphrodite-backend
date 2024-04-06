@@ -18,18 +18,19 @@ export class RolesGuard implements CanActivate {
 
     const req = context.switchToHttp().getRequest()
     const token = this.extractTokenFromHeader(req)
+    
     if (!token) {
       throw new UnauthorizedException()
     }
 
     let user
-  
     try {
       user = await this.jwtService.verifyAsync(token, {
         secret: SECRET
       })
       req.user = user
-    } catch {
+    } catch(e) {
+      console.log(e)
       throw new UnauthorizedException()
     }
 

@@ -1,17 +1,17 @@
 import { Body, Controller, Delete, HttpStatus, Param, Post, Get, UsePipes } from '@nestjs/common'
-import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger'
+import { ApiOperation, ApiResponse } from '@nestjs/swagger'
 import { ValidationPipe } from '../shared/pipes/validation.pipe'
 import { AddressService } from './address.service'
 import { User } from '../user/user.decorator'
 import { CreateAddressDto } from './dto'
+import { Roles } from '../user/role/roles.decorator'
 
-@ApiBearerAuth()
-@ApiTags('addresses')
+@Roles('user')
 @Controller('addresses')
 export class AddressController {
   constructor(private readonly addressService: AddressService) {}
 
-  @ApiOperation({ summary: 'Create address' })
+  @ApiOperation({ summary: 'Create address for current user.' })
   @ApiResponse({ status: HttpStatus.CREATED, description: 'The address has been successfully created.' })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
   @UsePipes(new ValidationPipe())

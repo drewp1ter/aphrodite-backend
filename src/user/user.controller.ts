@@ -7,6 +7,7 @@ import { IUserData } from './user.interface'
 import { UserService } from './user.service'
 
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
+import { Roles } from './role/roles.decorator'
 
 @ApiBearerAuth()
 @ApiTags('user')
@@ -15,12 +16,14 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get('user')
+  @Roles('user')
   async findMe(@User('id') userId: number): Promise<IUserData> {
     return this.userService.findById(userId)
   }
 
   @UsePipes(new ValidationPipe())
   @Put('user')
+  @Roles('user')
   async update(@User('id') userId: number, @Body('user') userData: UpdateUserDto) {
     return this.userService.update(userId, userData)
   }
@@ -38,6 +41,7 @@ export class UserController {
   }
 
   @Delete('users/:slug')
+  @Roles('user')
   async delete(@Param() params): Promise<any> {
     return this.userService.delete(params.slug)
   }
