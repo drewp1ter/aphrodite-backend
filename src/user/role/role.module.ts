@@ -9,7 +9,7 @@ import { SECRET } from '../../config'
     JwtModule.register({
       global: true,
       secret: SECRET,
-      signOptions: { expiresIn: '60s' }
+      signOptions: { expiresIn: '30d' }
     })
   ],
   providers: [
