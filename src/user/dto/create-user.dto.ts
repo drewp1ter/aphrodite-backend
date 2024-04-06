@@ -1,7 +1,8 @@
-import { IsNotEmpty, Length, MaxLength, IsPhoneNumber, IsEmail, IsOptional } from 'class-validator'
+import { IsNotEmpty, Length, MaxLength, IsPhoneNumber, IsEmail, IsString } from 'class-validator'
 
 export class CreateUserDto {
   @IsNotEmpty()
+  @IsString()
   @MaxLength(80)
   readonly name!: string
   
@@ -14,6 +15,7 @@ export class CreateUserDto {
   readonly phone!: string
 
   @IsNotEmpty()
+  @IsString()
   @Length(8, 64)
   readonly password!: string
 }

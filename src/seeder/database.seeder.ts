@@ -7,12 +7,20 @@ import { ProductFactory } from '../category/product/product.factory'
 import { CategoryFactory } from '../category/category.factory'
 import { OrderFactory } from '../order/order.factory'
 import { ProductImageFactory } from '../category/product/product-image/product-image.factory'
+import { Role } from '../user/role/role.entity'
+import { Role as RoleEnum } from '../user/role/role.enum'
 
 export class DatabaseSeeder extends Seeder {
   async run(em: EntityManager): Promise<void> {
+    const roleUser = new Role(RoleEnum.User)
+    const roleAdmin = new Role(RoleEnum.Admin)
+
+    em.persist(roleAdmin).persist(roleUser)
+
     const user = new UserFactory(em)
       .each((user) => {
         user.addresses.set(new AddressFactory(em).make(3))
+        user.roles.add(roleUser)
       })
       .makeOne()
 
