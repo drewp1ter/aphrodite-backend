@@ -11,6 +11,12 @@ import { Role } from './role/role.entity'
 export class User extends BaseEntity {
   [EntityRepositoryType]?: UserRepository
 
+  constructor(partial: Partial<Pick<User, 'name' | 'email' | 'password' | 'phone' | 'roles'>>) {
+    super()
+    Object.assign(this, partial)
+    this.password = partial.password ? crypto.createHmac('sha256', partial.password).digest('hex') : ''
+  }
+
   @ManyToMany({ entity: () => Role, eager: true })
   roles = new Collection<Role>(this)
 
@@ -36,12 +42,6 @@ export class User extends BaseEntity {
 
   @Property({ hidden: true, default: false })
   isPhoneConfirmed!: boolean
-
-  constructor(partial: Partial<Pick<User, 'name' | 'email' | 'password' | 'phone' | 'roles'>>) {
-    super()
-    Object.assign(this, partial)
-    this.password = partial.password ? crypto.createHmac('sha256', partial.password).digest('hex') : ''
-  }
 
   toJSON() {
     const o = wrap<User>(this).toObject() as UserDTO

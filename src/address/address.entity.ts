@@ -7,6 +7,11 @@ import { AddressRepository } from './address.repository'
 export class Address extends BaseEntity {
   [EntityRepositoryType]?: AddressRepository
 
+  constructor(partial: Partial<Omit<Address, 'id' | 'users'>>) {
+    super()
+    Object.assign(this, partial)
+  }
+
   @ManyToMany({ entity: () => User, mappedBy: 'addresses', hidden: true })
   users = new Collection<User>(this)
 
@@ -15,11 +20,6 @@ export class Address extends BaseEntity {
 
   @Property({ type: types.text })
   address!: string
-
-  constructor(partial: Partial<Omit<Address, 'id' | 'users'>>) {
-    super()
-    Object.assign(this, partial)
-  }
 
   toJSON() {
     return wrap<Address>(this).toObject() as AddressDto
