@@ -1,9 +1,20 @@
-import { Entity, Property, OneToMany, EntityDTO, wrap, Collection, Index } from '@mikro-orm/core'
+import { Entity, Property, OneToMany, EntityDTO, wrap, Collection, Index, EntityRepositoryType } from '@mikro-orm/core'
 import { BaseEntity } from '../shared/entities/base.entity'
 import { Product } from './product/product.entity'
+import { CategoryRepository } from './category.repository'
 
-@Entity()
+@Entity({ repository: () => CategoryRepository })
 export class Category extends BaseEntity {
+  [EntityRepositoryType]?: CategoryRepository
+  
+  constructor(name: string, description: string) {
+    super()
+    this.name = name
+    this.description = description
+    this.createdAt = new Date()
+    this.updatedAt = new Date()
+  }
+  
   @OneToMany(() => Product, (product) => product.category, { orphanRemoval: true })
   products = new Collection<Product>(this)
 
@@ -13,14 +24,6 @@ export class Category extends BaseEntity {
 
   @Property({ default: '', length: 8192 })
   description: string
-
-  constructor(name: string, description: string) {
-    super()
-    this.name = name
-    this.description = description
-    this.createdAt = new Date()
-    this.updatedAt = new Date()
-  }
 
   toJSON() {
     return wrap<Category>(this).toObject() as CategoryDto

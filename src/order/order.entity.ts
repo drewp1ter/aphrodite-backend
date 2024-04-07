@@ -6,15 +6,27 @@ import { Address } from '../address/address.entity'
 import { OrderItem } from './order-item.entity'
 import { OrderRepository } from './order.repository'
 
+export enum OrderPaymentType {
+  Cash = 'cash',
+  Online = 'online'
+}
+
 export enum OrderStatus {
-  new = 'new',
-  payed = 'payed',
-  canceled = 'canceled'
+  New = 'new',
+  Payed = 'payed',
+  Canceled = 'canceled',
+  Confirmed = 'confirmed'
 }
 
 @Entity({ repository: () => OrderRepository })
 export class Order extends BaseEntity {
   [EntityRepositoryType]?: OrderRepository
+
+  constructor(partial: Pick<Order, 'user' | 'address' | 'comment' | 'paymentType'>) { 
+    super()
+    Object.assign(this, partial)
+    this.status = OrderStatus.New
+  }
 
   @ManyToOne({ hidden: true })
   user!: User
@@ -22,10 +34,10 @@ export class Order extends BaseEntity {
   @ManyToOne({ nullable: true, hidden: true })
   address!: Address | null
 
-  @ManyToMany({ entity: () => Product, pivotEntity: () => OrderItem, hidden: true })
+  @ManyToMany({ entity: () => Product, pivotEntity: () => OrderItem })
   products = new Collection<Product>(this)
 
-  @Property({ default: OrderStatus.new, hidden: true })
+  @Property({ default: OrderStatus.New, hidden: true })
   status: OrderStatus
 
   @Property({ type: types.text, nullable: true })
@@ -34,10 +46,12 @@ export class Order extends BaseEntity {
   @Property()
   paymentType!: OrderPaymentType
 
-  constructor(partial: Pick<Order, 'user' | 'address' | 'comment' | 'paymentType'>) { 
-    super()
-    Object.assign(this, partial)
-    this.status = OrderStatus.new
+  @Property({ default: '' })
+  confirmationToken!: string
+
+  @Property({ persist: false })
+  get total() {
+    return this.products.reduce((acc, product) => acc + product.price, 0)
   }
 
   async toJSON() {
@@ -46,8 +60,3 @@ export class Order extends BaseEntity {
 }
 
 export interface OrderDto extends EntityDTO<Order> {}
-
-export enum OrderPaymentType {
-  cash = 'cash',
-  online = 'online'
-}

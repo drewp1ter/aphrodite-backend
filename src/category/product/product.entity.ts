@@ -9,6 +9,20 @@ import { ProductImage } from './product-image/product-image.entity'
 export class Product extends BaseEntity {
   [EntityRepositoryType]?: ProductRepository
 
+  constructor(
+    partial: PartialBy<Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'orders'>, 'calories' | 'carbohydrates' | 'flags' | 'fats' | 'squirrels'>
+  ) {
+    super()
+    this.name = partial.name
+    this.description = partial.description
+    this.squirrels = partial.squirrels ?? 0
+    this.fats = partial.fats ?? 0
+    this.carbohydrates = partial.carbohydrates ?? 0
+    this.flags = partial.flags ?? ProductFlags.none
+    this.calories = partial.calories ?? 0
+    this.price = partial.price
+  }
+
   @ManyToOne({ hidden: true })
   category!: Category
 
@@ -42,20 +56,6 @@ export class Product extends BaseEntity {
 
   @Property({ type: types.float })
   price: number
-
-  constructor(
-    partial: PartialBy<Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'orders'>, 'calories' | 'carbohydrates' | 'flags' | 'fats' | 'squirrels'>
-  ) {
-    super()
-    this.name = partial.name
-    this.description = partial.description
-    this.squirrels = partial.squirrels ?? 0
-    this.fats = partial.fats ?? 0
-    this.carbohydrates = partial.carbohydrates ?? 0
-    this.flags = partial.flags ?? ProductFlags.none
-    this.calories = partial.calories ?? 0
-    this.price = partial.price
-  }
 
   toJSON() {
     return wrap<Product>(this).toObject() as ProductDto

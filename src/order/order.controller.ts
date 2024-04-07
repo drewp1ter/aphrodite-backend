@@ -1,8 +1,11 @@
-import { Controller, Post, Body, UsePipes, BadRequestException } from '@nestjs/common'
+import { Controller, Post, Body, UsePipes, BadRequestException, ParseIntPipe, Get, Param, Delete, Query, Patch } from '@nestjs/common'
 import { ForeignKeyConstraintViolationException } from '@mikro-orm/mysql'
 import { ValidationPipe } from '../shared/pipes/validation.pipe'
 import { OrderService } from './order.service'
 import { CreateOrderDto } from './dto/create-order.dto'
+import { Roles } from '../user/role/roles.decorator'
+import { User } from '../user/user.decorator'
+import { OrderItemDto } from './dto/order-item.dto'
 
 @Controller('orders')
 export class OrderController {
@@ -20,5 +23,54 @@ export class OrderController {
       }
       throw e
     }
+  }
+
+  @Get(':orderId')
+  @Roles('user')
+  async findOne(@User('id') userId: number, @Param('orderId', ParseIntPipe) orderId: number) {
+    return this.orderService.findOne(orderId, userId)
+  }
+
+  @Get('my')
+  @Roles('user')
+  async findAllByUser(
+    @User('id') userId: number,
+    @Query('page', new ParseIntPipe({ optional: true })) page: number,
+    @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize: number
+  ) {
+    return this.orderService.findAllByUser({ userId, page, pageSize })
+  }
+
+  @Get()
+  @Roles('admin')
+  async findAll(
+    @Query('page', new ParseIntPipe({ optional: true })) page: number,
+    @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize: number
+  ) {
+    return this.orderService.findAll(page, pageSize)
+  }
+
+  @Post(':orderId')
+  @Roles('admin')
+  async addProduct(@Param(':orderId', ParseIntPipe) orderId: number, @Body('product') orderItemDto: OrderItemDto) {
+    return this.orderService.addProduct({ orderId, productId: orderItemDto.productId, amount: orderItemDto.amount })
+  }
+
+  @Delete(':orderId/:productId')
+  @Roles('admin')
+  async removeProduct(@Param('orderId', ParseIntPipe) orderId: number, @Param('productId', ParseIntPipe) productId: number) {
+    return this.orderService.removeProduct({ orderId, productId })
+  }
+
+  @Delete(':orderId')
+  @Roles('admin')
+  async delete(@Param('orderId', ParseIntPipe) orderId: number) {
+    return this.orderService.delete(orderId)
+  }
+
+  @Patch(':orderId')
+  @Roles('admin')
+  async confirm(@Param('orderId', ParseIntPipe) orderId: number) {
+    return this.orderService.confirm(orderId)
   }
 }

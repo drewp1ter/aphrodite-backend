@@ -7,12 +7,12 @@ import { UserModule } from './user/user.module'
 import { AddressModule } from './address/address.module'
 import { CategoryModule } from './category/category.module'
 import { OrderModule } from './order/order.module'
-import { RolesGuard } from './user/role/role.guard'
+import { RoeleModule } from './user/role/role.module'
 
 @Module({
   controllers: [AppController],
-  imports: [MikroOrmModule.forRoot(), UserModule, AddressModule, CategoryModule, OrderModule],
-  providers: [{ provide: 'APP_GUARD', useClass: RolesGuard }]
+  imports: [MikroOrmModule.forRoot(), UserModule, AddressModule, CategoryModule, OrderModule, RoeleModule],
+  providers: []
 })
 export class AppModule implements NestModule, OnModuleInit {
   constructor(private readonly orm: MikroORM) {}

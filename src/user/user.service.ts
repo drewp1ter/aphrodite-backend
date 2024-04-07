@@ -1,9 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { validate } from 'class-validator'
 import crypto from 'crypto'
-import jwt from 'jsonwebtoken'
+import { JwtService } from '@nestjs/jwt'
 import { EntityManager, wrap } from '@mikro-orm/core'
-import { SECRET } from '../config'
 import { CreateUserDto, LoginUserDto, UpdateUserDto } from './dto'
 import { User } from './user.entity'
 import { Role } from './role/role.entity'
@@ -13,21 +12,24 @@ import { UserRepository } from './user.repository'
 
 @Injectable()
 export class UserService {
-  constructor(private readonly userRepository: UserRepository, private readonly em: EntityManager) {}
+  constructor(private readonly userRepository: UserRepository, private readonly em: EntityManager, private jwtService: JwtService) {}
 
-  async findOne(loginUserDto: LoginUserDto): Promise<User | null> {
-    const findOneOptions = {
+  async signIn(loginUserDto: LoginUserDto): Promise<IUserData>  {
+    const foundUser = await this.userRepository.findOne({
       email: loginUserDto.email,
       password: crypto.createHmac('sha256', loginUserDto.password).digest('hex')
+    })
+
+    if (!foundUser) {
+      const errors = { User: ' not found' }
+      throw new HttpException({ errors }, 401)
     }
 
-    return this.userRepository.findOne(findOneOptions)
+    return this.buildUserRO(foundUser)
   }
 
-  async create(dto: CreateUserDto): Promise<IUserData> {
-    const { name, email, password, phone } = dto
-
-    const user = new User({ name, password, phone, email })
+  async signUp(createUserDto: CreateUserDto): Promise<IUserData> {
+    const user = new User(createUserDto)
     const roleUser = await this.em.findOneOrFail(Role, { role: RoleEnum.User })
     user.roles.add(roleUser)
 
@@ -54,10 +56,6 @@ export class UserService {
     return this.buildUserRO(user)
   }
 
-  async delete(email: string) {
-    return this.userRepository.nativeDelete({ email })
-  }
-
   async findById(id: number): Promise<IUserData> {
     const user = await this.userRepository.findOne(id)
 
@@ -69,28 +67,14 @@ export class UserService {
     return this.buildUserRO(user)
   }
 
-  generateJWT(user) {
-    const today = new Date()
-    const exp = new Date(today)
-    exp.setDate(today.getDate() + 60)
-
-    return jwt.sign(
-      {
-        exp: exp.getTime() / 1000,
-        id: user.id
-      },
-      SECRET
-    )
-  }
-
-  private buildUserRO(user: User): IUserData {
+  async buildUserRO(user: User): Promise<IUserData> {
+    const jwtPayload = { id: user.id, roles: user.roles.map((role) => role.role) }
     return {
       id: user.id,
       email: user.email,
       phone: user.phone,
-      token: this.generateJWT(user),
-      name: user.name,
-      roles: user.roles.getItems().map(item => item.role)
+      token: await this.jwtService.signAsync(jwtPayload),
+      name: user.name
     }
   }
 }
