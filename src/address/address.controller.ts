@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, HttpStatus, Param, Post, Get, UsePipes } from '@nestjs/common'
+import { Body, Controller, Delete, HttpStatus, Param, Post, Get, UsePipes ,ParseIntPipe } from '@nestjs/common'
 import { ApiOperation, ApiResponse } from '@nestjs/swagger'
 import { ValidationPipe } from '../shared/pipes/validation.pipe'
 import { AddressService } from './address.service'
@@ -31,9 +31,8 @@ export class AddressController {
   @ApiOperation({ summary: 'DeleteAddress' })
   @ApiResponse({ status: HttpStatus.CREATED, description: 'The address has been successfully deleted.' })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.' })
-  @Delete(':id')
-  async deleteAddress(@User('id') userId: number, @Param() params) {
-    const { id } = params
-    return this.addressService.delete(userId, id)
+  @Delete(':addressId')
+  async deleteAddress(@User('id') userId: number, @Param('addressId', ParseIntPipe) addressId: number) {
+    return this.addressService.delete(userId, addressId)
   }
 }

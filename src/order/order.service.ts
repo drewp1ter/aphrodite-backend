@@ -101,7 +101,7 @@ export class OrderService {
     })
   }
 
-  async confirmOrder(orderId: number) {
+  async confirm(orderId: number) {
     return this.orderRepository.nativeUpdate({ id: orderId }, { status: OrderStatus.Confirmed })
   }
 }
