@@ -11,8 +11,8 @@ import { User } from '../../user/user.entity'
 
 describe('Auth', () => {
   let app: INestApplication
-  let jwt: string
-  let user: User
+  let jwt_service
+  let user: Partial<User>
   let orm: Awaited<ReturnType<typeof MikroORM.init>>
 
   beforeAll(async () => {
@@ -31,24 +31,18 @@ describe('Auth', () => {
     await app.init()
 
     await seeder.seed(UsersSeeder)
-    const users = await orm.em.findAll(User, { limit: 1 })
-    user = users[0]
+    user = {
+      name: faker.person.fullName(),
+      phone: '+79991234567',
+      password: faker.internet.password({ length: 10 }),
+      email: faker.internet.email()
+    }
 
-    const jwt_service = moduleRef.get(JwtService)
-    jwt = jwt_service.sign({ id: user.id, roles: ['user', 'admin'] })
+    jwt_service = moduleRef.get(JwtService)
   })
 
   it('POST /auth/sign-up => should create new user', async () => {
-    const res = await request(app.getHttpServer())
-      .post('/auth/sign-up')
-      .send({
-        user: {
-          name: faker.person.fullName(),
-          phone: '+79991234567',
-          password: faker.internet.password({ length: 10 }),
-          email: faker.internet.email()
-        }
-      })
+    const res = await request(app.getHttpServer()).post('/auth/sign-up').send({ user })
     expect(res.body).toEqual({})
     expect(res.status).toBe(201)
   })
@@ -57,7 +51,6 @@ describe('Auth', () => {
     const res = await request(app.getHttpServer())
       .post('/auth/sign-up')
       .send({ user: { name: '', phone: '', password: '', email: '' } })
-    expect(res.status).toBe(400)
     expect(res.body).toEqual({
       message: 'Input data validation failed',
       errors: {
@@ -66,6 +59,24 @@ describe('Auth', () => {
         passwordisLength: 'password must be longer than or equal to 8 characters',
         phoneisPhoneNumber: 'phone must be a valid phone number'
       }
+    })
+    expect(res.status).toBe(400)
+  })
+
+  it('POST /auth/sign-in => should return user', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/auth/sign-in')
+      .send({ user: { email: user.email, password: user.password } })
+    expect(res.status).toBe(201)
+    const createdUser = await orm.em.findOneOrFail(User, { email: user.email })
+    const jwt = jwt_service.sign({ id: createdUser.id, roles: ['user'] })
+    expect(res.body).toEqual({
+      id: createdUser.id,
+      email: createdUser.email,
+      phone: createdUser.phone,
+      name: createdUser.name,
+      roles: ['user'],
+      token: jwt
     })
   })
 

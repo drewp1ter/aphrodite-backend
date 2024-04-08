@@ -11,9 +11,9 @@ export class AuthController {
 
   @UsePipes(new ValidationPipe())
   @Post('sign-up')
-  async signUp(@Body('user') userData: SignUpDto) {
+  async signUp(@Body('user') signUpDto: SignUpDto) {
     try {
-      await this.authService.signUp(userData)
+      await this.authService.signUp(signUpDto)
       return
     } catch (e) {
       if (e instanceof UniqueConstraintViolationException) return
@@ -23,7 +23,7 @@ export class AuthController {
 
   @UsePipes(new ValidationPipe())
   @Post('sign-in')
-  async signIn(@Body('user') loginUserDto: SignInDto): Promise<ISignInData> {
-    return this.authService.signIn(loginUserDto)
+  async signIn(@Body('user') signInDto: SignInDto): Promise<ISignInData> {
+    return this.authService.signIn(signInDto)
   }
 }

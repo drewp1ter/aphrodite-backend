@@ -3,12 +3,13 @@ import { AuthController } from './auth.controller'
 import { UserService } from '../user/user.service'
 import { RoleModule } from './role/role.module'
 import { AuthService } from './auth.service'
-import { UserRepository } from '../user/user.repository'
+import { MikroOrmModule } from '@mikro-orm/nestjs'
+import { User } from '../user/user.entity'
 
 @Module({
   controllers: [AuthController],
-  exports: [],
-  imports: [RoleModule],
-  providers: [UserService, AuthService, UserRepository]
+  exports: [AuthService],
+  imports: [MikroOrmModule.forFeature({ entities: [User] }), RoleModule],
+  providers: [UserService, AuthService]
 })
 export class AuthModule {}

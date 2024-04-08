@@ -4,6 +4,7 @@ import { User } from './user.entity'
 import { UserAddress } from './user-address.entity'
 import { UserService } from './user.service'
 import { MikroOrmModule } from '@mikro-orm/nestjs'
+import { AuthModule } from '../auth/auth.module'
 
 @Module({
   controllers: [UserController],
