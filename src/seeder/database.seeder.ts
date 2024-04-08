@@ -7,8 +7,8 @@ import { ProductFactory } from '../category/product/product.factory'
 import { CategoryFactory } from '../category/category.factory'
 import { OrderFactory } from '../order/order.factory'
 import { ProductImageFactory } from '../category/product/product-image/product-image.factory'
-import { Role } from '../user/role/role.entity'
-import { Role as RoleEnum } from '../user/role/role.enum'
+import { Role } from '../auth/role/role.entity'
+import { Role as RoleEnum } from '../auth/role/role.enum'
 
 export class DatabaseSeeder extends Seeder {
   async run(em: EntityManager): Promise<void> {

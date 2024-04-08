@@ -4,12 +4,11 @@ import { User } from './user.entity'
 import { UserAddress } from './user-address.entity'
 import { UserService } from './user.service'
 import { MikroOrmModule } from '@mikro-orm/nestjs'
-import { RoleModule } from './role/role.module'
 
 @Module({
   controllers: [UserController],
   exports: [UserService],
-  imports: [MikroOrmModule.forFeature({ entities: [User, UserAddress] }), RoleModule],
+  imports: [MikroOrmModule.forFeature({ entities: [User, UserAddress] })],
   providers: [UserService]
 })
 export class UserModule {}

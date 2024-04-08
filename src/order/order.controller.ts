@@ -3,7 +3,7 @@ import { ForeignKeyConstraintViolationException } from '@mikro-orm/mysql'
 import { ValidationPipe } from '../shared/pipes/validation.pipe'
 import { OrderService } from './order.service'
 import { CreateOrderDto } from './dto/create-order.dto'
-import { Roles } from '../user/role/roles.decorator'
+import { Roles } from '../auth/role/roles.decorator'
 import { User } from '../user/user.decorator'
 import { OrderItemDto } from './dto/order-item.dto'
 

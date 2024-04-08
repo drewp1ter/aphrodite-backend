@@ -1,11 +1,10 @@
-import { IsEmail, IsPhoneNumber } from 'class-validator'
 import crypto from 'crypto'
 import { Collection, Entity, EntityDTO, EntityRepositoryType, ManyToMany, Property, wrap } from '@mikro-orm/core'
 import { BaseEntity } from '../shared/entities/base.entity'
 import { Address } from '../address/address.entity'
 import { UserRepository } from './user.repository'
 import { UserAddress } from './user-address.entity'
-import { Role } from './role/role.entity'
+import { Role } from '../auth/role/role.entity'
 
 @Entity({ repository: () => UserRepository })
 export class User extends BaseEntity {
@@ -27,11 +26,9 @@ export class User extends BaseEntity {
   name!: string
 
   @Property({ unique: true, default: '' })
-  @IsEmail()
   email!: string
 
   @Property({ unique: true })
-  @IsPhoneNumber()
   phone!: string
 
   @Property({ hidden: true })
