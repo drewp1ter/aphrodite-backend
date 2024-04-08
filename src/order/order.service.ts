@@ -11,6 +11,7 @@ import { OrderItem } from './order-item.entity'
 import { UserAddress } from '../user/user-address.entity'
 import { OrderRepository } from './order.repository'
 import { OrderStatus } from './order.entity'
+import { config } from '../config'
 @Injectable()
 export class OrderService {
   constructor(
@@ -60,12 +61,12 @@ export class OrderService {
     return order.toJSON()
   }
 
-  async findAll(page: number = 1, pageSize: number = 30) {
+  async findAll(page: number = 1, pageSize: number = config.defaultPageSize) {
     const offset = (page - 1) * pageSize
     return this.orderRepository.findAndCount({}, { limit: pageSize, offset, orderBy: { createdAt: 'DESC' } })
   }
 
-  async findAllByUser({ userId, page = 1, pageSize = 30 }: FindAllByUserProps) {
+  async findAllByUser({ userId, page = 1, pageSize = config.defaultPageSize }: FindAllByUserProps) {
     const offset = (page - 1) * pageSize
     return this.orderRepository.findAndCount({ user: userId }, { limit: pageSize, offset, orderBy: { createdAt: 'DESC' } })
   }
@@ -104,4 +105,16 @@ export class OrderService {
   async confirm(orderId: number) {
     return this.orderRepository.nativeUpdate({ id: orderId }, { status: OrderStatus.Confirmed })
   }
+}
+
+export interface FindAllByUserProps {
+  userId: number
+  page?: number
+  pageSize?: number
+}
+
+export interface AddProductProps {
+  orderId: number
+  productId: number
+  amount?: number
 }

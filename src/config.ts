@@ -1,5 +1,6 @@
 const defaultConfig = {
   debug: true,
+  defaultPageSize: 30,
   jwt: {
     secret: 'changeme',
     expiresIn: '1d'

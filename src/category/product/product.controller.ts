@@ -18,7 +18,11 @@ export class ProductController {
   @ApiOperation({ summary: 'Get all product categories' })
   @ApiResponse({ status: HttpStatus.OK })
   @Get('products')
-  async findAll(@Query('query') query: string) {
-    return this.productService.find(query)
+  async findAll(
+    @Query('query') query: string,
+    @Query('page', new ParseIntPipe({ optional: true })) page: number,
+    @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize: number
+  ) {
+    return this.productService.find({query, page, pageSize})
   }
 }
