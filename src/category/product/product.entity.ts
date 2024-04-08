@@ -26,10 +26,10 @@ export class Product extends BaseEntity {
   @ManyToOne({ hidden: true })
   category!: Category
 
-  @ManyToMany({ entity: () => Order, mappedBy: 'products', hidden: true })
+  @ManyToMany({ entity: () => Order, mappedBy: 'products', hidden: true, eager: false })
   orders = new Collection<Order>(this)
 
-  @OneToMany(() => ProductImage, image => image.product, { orphanRemoval: true })
+  @OneToMany(() => ProductImage, image => image.product, { orphanRemoval: true, eager: false })
   images = new Collection<ProductImage>(this)
 
   @Property()

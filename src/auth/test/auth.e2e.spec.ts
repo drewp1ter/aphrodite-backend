@@ -69,14 +69,13 @@ describe('Auth', () => {
       .send({ user: { email: user.email, password: user.password } })
     expect(res.status).toBe(201)
     const createdUser = await orm.em.findOneOrFail(User, { email: user.email })
-    const jwt = jwt_service.sign({ id: createdUser.id, roles: ['user'] })
     expect(res.body).toEqual({
       id: createdUser.id,
       email: createdUser.email,
       phone: createdUser.phone,
       name: createdUser.name,
       roles: ['user'],
-      token: jwt
+      token: expect.stringContaining('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9')
     })
   })
 

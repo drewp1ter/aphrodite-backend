@@ -37,7 +37,7 @@ describe('User', () => {
     jwt = jwt_service.sign({ id: user.id, roles: ['user', 'admin'] })
   })
 
-  it('GET user => should return autentificated user info', async () => {
+  it('GET /user => should return autentificated user info', async () => {
     const res = await request(app.getHttpServer()).get('/user').set('Authorization', `Bearer ${jwt}`)
     expect(res.status).toBe(200)
     expect(res.body).toEqual({
@@ -49,7 +49,7 @@ describe('User', () => {
     })
   })
 
-  it('GET user => should return unauthorized error', async () => {
+  it('GET /user => should return unauthorized error', async () => {
     const res = await request(app.getHttpServer()).get('/user').set('Authorization', `Bearer bad${jwt}`)
     expect(res.status).toBe(401)
     expect(res.body).toEqual({
