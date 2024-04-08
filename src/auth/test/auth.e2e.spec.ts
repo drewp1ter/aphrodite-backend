@@ -41,7 +41,7 @@ describe('Auth', () => {
     jwt_service = moduleRef.get(JwtService)
   })
 
-  it('POST /auth/sign-up => should create new user', async () => {
+  it('POST /auth/sign-up => should create the new user', async () => {
     const res = await request(app.getHttpServer()).post('/auth/sign-up').send({ user })
     expect(res.body).toEqual({})
     expect(res.status).toBe(201)
@@ -50,20 +50,20 @@ describe('Auth', () => {
   it('POST /auth/sign-up => should return bad password, name, phone and email errors', async () => {
     const res = await request(app.getHttpServer())
       .post('/auth/sign-up')
-      .send({ user: { name: '', phone: '', password: '', email: '' } })
+      .send({ user: { name: '', phone: '', password: '', email: '_' } })
     expect(res.body).toEqual({
       message: 'Input data validation failed',
       errors: {
         nameisNotEmpty: 'name should not be empty',
-        emailisEmail: 'email must be an email',
-        passwordisLength: 'password must be longer than or equal to 8 characters',
-        phoneisPhoneNumber: 'phone must be a valid phone number'
+        emailisEmail: 'email должен быть электронной почтой',
+        passwordisLength: 'пароль должен быть длиннее или равен 8 символам',
+        phoneisPhoneNumber: 'телефон должен быть действительным номером телефона'
       }
     })
     expect(res.status).toBe(400)
   })
 
-  it('POST /auth/sign-in => should return user', async () => {
+  it('POST /auth/sign-in => should return the user', async () => {
     const res = await request(app.getHttpServer())
       .post('/auth/sign-in')
       .send({ user: { email: user.email, password: user.password } })
@@ -78,6 +78,32 @@ describe('Auth', () => {
       roles: ['user'],
       token: jwt
     })
+  })
+
+  it('POST /auth/sign-in => should return the valiadation error', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/auth/sign-in')
+      .send({ user: { email: '', password: '' } })
+    expect(res.body).toEqual({
+      errors: {
+        emailisNotEmpty: 'email не должен быть пустым.',
+        passwordisNotEmpty: 'пароль не должен быть пустым.'
+      },
+      message: 'Input data validation failed'
+    })
+    expect(res.status).toBe(400)
+  })
+
+  it('POST /auth/sign-in => should return the login incorrect error', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/auth/sign-in')
+      .send({ user: { email: faker.internet.email(), password: faker.internet.password() } })
+    expect(res.body).toEqual({
+      errors: {
+        "User": "неверный логин или пароль.",
+      }
+    })
+    expect(res.status).toBe(401)
   })
 
   afterAll(async () => {

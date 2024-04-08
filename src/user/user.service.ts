@@ -19,7 +19,7 @@ export class UserService {
     })
 
     if (!foundUser) {
-      const errors = { User: ' not found' }
+      const errors = { User: 'неверный логин или пароль.' }
       throw new HttpException({ errors }, HttpStatus.UNAUTHORIZED)
     }
 
@@ -45,7 +45,7 @@ export class UserService {
     const user = await this.userRepository.findOne(id)
 
     if (!user) {
-      const errors = { User: ' not found' }
+      const errors = { User: 'not found' }
       throw new HttpException({ errors }, 401)
     }
 

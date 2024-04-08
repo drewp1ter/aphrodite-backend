@@ -1,9 +1,9 @@
 import { IsNotEmpty } from 'class-validator'
 
 export class SignInDto {
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'email не должен быть пустым.' })
   readonly email!: string
 
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'пароль не должен быть пустым.' })
   readonly password!: string
 }
