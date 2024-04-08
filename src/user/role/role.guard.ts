@@ -2,7 +2,7 @@ import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from
 import { Reflector } from '@nestjs/core'
 import { JwtService } from '@nestjs/jwt'
 import { Request } from 'express'
-import { SECRET } from '../../config'
+import { config } from '../../config'
 import { ROLES_KEY } from './roles.decorator'
 import { Role } from './role.enum'
 
@@ -26,7 +26,7 @@ export class RolesGuard implements CanActivate {
     let user
     try {
       user = await this.jwtService.verifyAsync(token, {
-        secret: SECRET
+        secret: config.jwt.secret
       })
       req.user = user
     } catch(e) {

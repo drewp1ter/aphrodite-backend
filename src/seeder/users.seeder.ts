@@ -1,11 +1,10 @@
 import { EntityManager } from '@mikro-orm/core'
 import { Seeder } from '@mikro-orm/seeder'
-import { User } from '../user/user.entity'
 import { Role } from '../user/role/role.entity'
 import { Role as RoleEnum } from '../user/role/role.enum'
-import { config } from '../config'
+import { UserFactory } from '../../src/user/user.factory'
 
-export class AdminSeeder extends Seeder {
+export class UsersSeeder extends Seeder {
   async run(em: EntityManager): Promise<void> {
     let adminRole = await em.findOne(Role, { role: RoleEnum.Admin })
     adminRole ??= new Role(RoleEnum.Admin)
@@ -13,9 +12,13 @@ export class AdminSeeder extends Seeder {
     let userRole = await em.findOne(Role, { role: RoleEnum.User })
     userRole ??= new Role(RoleEnum.User)
 
-    const user = new User(config.admin)
-    user.roles.set([userRole, adminRole])
+    const admin = new UserFactory(em).makeEntity()
+    admin.roles.set([userRole, adminRole])
 
+    const user = new UserFactory(em).makeEntity()
+    user.roles.add(userRole)
+
+    await em.persistAndFlush(admin)
     await em.persistAndFlush(user)
   }
 }

@@ -10,25 +10,25 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { Roles } from './role/roles.decorator'
 
 @ApiBearerAuth()
-@Controller('user')
+@Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Get('profile')
+  @Get('me')
   @Roles('user')
   async findMe(@User('id') userId: number): Promise<IUserData> {
     return this.userService.findById(userId)
   }
 
   @UsePipes(new ValidationPipe())
-  @Put('profile')
+  @Put('me')
   @Roles('user')
   async update(@User('id') userId: number, @Body('user') userData: UpdateUserDto) {
     return this.userService.update(userId, userData)
   }
 
   @UsePipes(new ValidationPipe())
-  @Post('users')
+  @Post()
   async create(@Body('user') userData: CreateUserDto) {
     try {
       await this.userService.signUp(userData)
