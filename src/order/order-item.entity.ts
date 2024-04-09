@@ -1,4 +1,4 @@
-import { Entity, Property, ManyToOne, EntityDTO } from '@mikro-orm/core'
+import { Entity, Property, ManyToOne, Check } from '@mikro-orm/core'
 import { Product } from '../category/product/product.entity'
 import { Order } from './order.entity'
 
@@ -11,5 +11,6 @@ export class OrderItem {
   product!: Product
 
   @Property({ default: 1 })
+  @Check({ expression: 'amount > 0' })
   amount!: number
 }

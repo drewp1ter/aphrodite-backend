@@ -52,7 +52,7 @@ export class OrderController {
 
   @Post(':orderId')
   @Roles('admin')
-  async addProduct(@Param(':orderId', ParseIntPipe) orderId: number, @Body('product') orderItemDto: OrderItemDto) {
+  async addProduct(@Param(':orderId', ParseIntPipe) orderId: number, @Body() orderItemDto: OrderItemDto) {
     return this.orderService.addProduct({ orderId, productId: orderItemDto.productId, amount: orderItemDto.amount })
   }
 

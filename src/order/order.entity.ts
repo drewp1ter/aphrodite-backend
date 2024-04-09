@@ -1,4 +1,4 @@
-import { Entity, EntityRepositoryType, Property, ManyToOne, ManyToMany, EntityDTO, Collection, wrap, types } from '@mikro-orm/core'
+import { Entity, EntityRepositoryType, Property, ManyToOne, ManyToMany, EntityDTO, Collection, wrap, types, LoadStrategy } from '@mikro-orm/core'
 import { BaseEntity } from '../shared/entities/base.entity'
 import { User } from '../user/user.entity'
 import { Product } from '../category/product/product.entity'
@@ -34,7 +34,7 @@ export class Order extends BaseEntity {
   @ManyToOne({ nullable: true, hidden: true })
   address!: Address | null
 
-  @ManyToMany({ entity: () => Product, pivotEntity: () => OrderItem })
+  @ManyToMany({ entity: () => Product, pivotEntity: () => OrderItem, owner: true })
   products = new Collection<Product>(this)
 
   @Property({ default: OrderStatus.New, hidden: true })
@@ -46,7 +46,7 @@ export class Order extends BaseEntity {
   @Property()
   paymentType!: OrderPaymentType
 
-  @Property({ default: '' })
+  @Property({ default: '', hidden: true, lazy: true })
   confirmationToken!: string
 
   @Property({ persist: false })
@@ -55,7 +55,9 @@ export class Order extends BaseEntity {
   }
 
   async toJSON() {
-    return wrap<Order>(this).toObject() as OrderDto
+    const order = wrap<Order>(this).toObject() as OrderDto
+    order.products = this.products.toJSON()
+    return order
   }
 }
 

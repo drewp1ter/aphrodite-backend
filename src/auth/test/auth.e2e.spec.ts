@@ -42,15 +42,13 @@ describe('Auth', () => {
   })
 
   it('POST /auth/sign-up => should create the new user', async () => {
-    const res = await request(app.getHttpServer()).post('/auth/sign-up').send({ user })
+    const res = await request(app.getHttpServer()).post('/auth/sign-up').send(user)
     expect(res.body).toEqual({})
     expect(res.status).toBe(201)
   })
 
   it('POST /auth/sign-up => should return bad password, name, phone and email errors', async () => {
-    const res = await request(app.getHttpServer())
-      .post('/auth/sign-up')
-      .send({ user: { name: '', phone: '', password: '', email: '_' } })
+    const res = await request(app.getHttpServer()).post('/auth/sign-up').send({ name: '', phone: '', password: '', email: '_' })
     expect(res.body).toEqual({
       message: 'Input data validation failed',
       errors: {
@@ -64,9 +62,7 @@ describe('Auth', () => {
   })
 
   it('POST /auth/sign-in => should return the user', async () => {
-    const res = await request(app.getHttpServer())
-      .post('/auth/sign-in')
-      .send({ user: { email: user.email, password: user.password } })
+    const res = await request(app.getHttpServer()).post('/auth/sign-in').send({ email: user.email, password: user.password })
     expect(res.status).toBe(201)
     const createdUser = await orm.em.findOneOrFail(User, { email: user.email })
     expect(res.body).toEqual({
@@ -94,12 +90,10 @@ describe('Auth', () => {
   })
 
   it('POST /auth/sign-in => should return the login incorrect error', async () => {
-    const res = await request(app.getHttpServer())
-      .post('/auth/sign-in')
-      .send({ user: { email: faker.internet.email(), password: faker.internet.password() } })
+    const res = await request(app.getHttpServer()).post('/auth/sign-in').send({ email: faker.internet.email(), password: faker.internet.password() })
     expect(res.body).toEqual({
       errors: {
-        "User": "неверный логин или пароль.",
+        User: 'неверный логин или пароль.'
       }
     })
     expect(res.status).toBe(401)

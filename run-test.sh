@@ -2,7 +2,6 @@
 export NODE_ENV=test
 export DB_NAME=test
 export DB_PORT=3308
-export DEBUG=false
 
 MYSQL_DATA_DIR=/dev/shm/mysql
 CONTAINER_NAME=mysql_test

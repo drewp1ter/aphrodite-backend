@@ -302,7 +302,14 @@
           "unique": true
         }
       ],
-      "checks": [],
+      "checks": [
+        {
+          "name": "product_price_check",
+          "expression": "price >= 0",
+          "definition": "check ((price >= 0))",
+          "columnName": "price"
+        }
+      ],
       "foreignKeys": {
         "product_category_id_foreign": {
           "constraintName": "product_category_id_foreign",
@@ -447,6 +454,16 @@
       "name": "role",
       "indexes": [
         {
+          "columnNames": [
+            "role"
+          ],
+          "composite": false,
+          "keyName": "role_role_unique",
+          "constraint": true,
+          "primary": false,
+          "unique": true
+        },
+        {
           "keyName": "PRIMARY",
           "columnNames": [
             "id"
@@ -554,6 +571,16 @@
       "indexes": [
         {
           "columnNames": [
+            "email"
+          ],
+          "composite": false,
+          "keyName": "user_email_unique",
+          "constraint": true,
+          "primary": false,
+          "unique": true
+        },
+        {
+          "columnNames": [
             "phone"
           ],
           "composite": false,
@@ -652,6 +679,16 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "mappedType": "string"
+        },
+        "confirmation_token": {
+          "name": "confirmation_token",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "''",
           "mappedType": "string"
         }
       },
@@ -783,7 +820,14 @@
           "unique": true
         }
       ],
-      "checks": [],
+      "checks": [
+        {
+          "name": "order_item_amount_check",
+          "expression": "amount > 0",
+          "definition": "check ((amount > 0))",
+          "columnName": "amount"
+        }
+      ],
       "foreignKeys": {
         "order_item_order_id_foreign": {
           "constraintName": "order_item_order_id_foreign",

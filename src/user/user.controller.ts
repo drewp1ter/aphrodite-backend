@@ -21,7 +21,7 @@ export class UserController {
 
   @UsePipes(new ValidationPipe())
   @Put()
-  async update(@User('id') userId: number, @Body('user') userData: UpdateUserDto) {
+  async update(@User('id') userId: number, @Body() userData: UpdateUserDto) {
     return this.userService.update(userId, userData)
   }
 }

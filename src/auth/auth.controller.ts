@@ -11,7 +11,7 @@ export class AuthController {
 
   @UsePipes(new ValidationPipe())
   @Post('sign-up')
-  async signUp(@Body('user') signUpDto: SignUpDto) {
+  async signUp(@Body() signUpDto: SignUpDto) {
     try {
       await this.authService.signUp(signUpDto)
       return
@@ -23,7 +23,7 @@ export class AuthController {
 
   @UsePipes(new ValidationPipe())
   @Post('sign-in')
-  async signIn(@Body('user') signInDto: SignInDto): Promise<ISignInData> {
+  async signIn(@Body() signInDto: SignInDto): Promise<ISignInData> {
     return this.authService.signIn(signInDto)
   }
 }

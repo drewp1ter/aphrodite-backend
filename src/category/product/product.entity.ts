@@ -1,4 +1,4 @@
-import { Entity, EntityRepositoryType, Property, ManyToOne, EntityDTO, ManyToMany, Collection, wrap, Index, types, OneToMany } from '@mikro-orm/core'
+import { Entity, EntityRepositoryType, Property, ManyToOne, EntityDTO, ManyToMany, Collection, wrap, Index, types, Check, OneToMany, OneToOne } from '@mikro-orm/core'
 import { BaseEntity } from '../../shared/entities/base.entity'
 import { Category } from '../category.entity'
 import { Order } from '../../order/order.entity'
@@ -55,6 +55,7 @@ export class Product extends BaseEntity {
   calories: number
 
   @Property({ type: types.float })
+  @Check({ expression: 'price >= 0' })
   price: number
 
   toJSON() {

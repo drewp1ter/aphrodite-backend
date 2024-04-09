@@ -25,7 +25,7 @@ export class OrderService {
   ) {}
 
   async create(dto: CreateOrderDto) {
-    return this.em.transactional(async (em: EntityManager) => {
+    const order = await this.em.transactional(async (em: EntityManager) => {
       let user = await this.userRepository.findOne({ phone: dto.phone })
       user ??= new User({ name: dto.name, phone: dto.phone })
 
@@ -33,27 +33,24 @@ export class OrderService {
       address ??= new Address(dto.address)
 
       const order = new Order({ user, address, comment: dto.comment, paymentType: dto.paymentType })
-      em.persist(user).persist(address).persist(order)
-
       for (const item of dto.items) {
-        const orderItem = em.create(OrderItem, {
+        em.create(OrderItem, {
           order,
           product: item.productId,
           amount: item.amount
         })
-        em.persist(orderItem)
       }
 
-      await em.flush()
-
-      let userAddress = await em.findOne(UserAddress, { user, address })
+      let userAddress = await em.count(UserAddress, { user, address })
       if (!userAddress) {
-        userAddress = em.create(UserAddress, { user, address })
-        await em.persistAndFlush(userAddress)
+        em.create(UserAddress, { user, address })
       }
 
-      return order.toJSON()
+      return order
     })
+
+    await this.em.refresh(order, { populate: ['products'] })
+    return order!.toJSON()
   }
 
   async findOne(orderId: number, userId: number) {

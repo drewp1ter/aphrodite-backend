@@ -1,5 +1,5 @@
 const defaultConfig = {
-  debug: true,
+  debug: false,
   defaultPageSize: 30,
   jwt: {
     secret: 'changeme',
