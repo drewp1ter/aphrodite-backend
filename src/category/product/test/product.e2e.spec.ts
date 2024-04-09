@@ -1,5 +1,4 @@
 import request from 'supertest'
-import { faker } from '@faker-js/faker'
 import { MikroORM } from '@mikro-orm/core'
 import { Test } from '@nestjs/testing'
 import { INestApplication } from '@nestjs/common'
@@ -30,7 +29,7 @@ describe('Product', () => {
     await seeder.seed(ProductSeeder)
   })
 
-  it('GET /products => should search products', async () => {
+  it('GET /products => should find products by their name', async () => {
     const products = (await orm.em.findAll(Product, { populate: ['images'] })).map((product) => product.toJSON())
     const names = Array.from(
       new Set(
@@ -39,13 +38,13 @@ describe('Product', () => {
           return prev
         }, [])
       )
-    ).join(' ')
+    ).join('+')
     const res = await request(app.getHttpServer()).get(`/products?query=${names}`)
     expect(res.status).toBe(200)
     expect(res.body).toEqual(products)
   })
 
-  it('GET /categories/:categoryId/products => should return all products of category', async () => {
+  it('GET /categories/:categoryId/products => should return list of all products belongs to category', async () => {
     const categoryId = 1
     const products = (await orm.em.findAll(Product, { populate: ['images'], where: { category: categoryId } })).map((product) => product.toJSON())
     const res = await request(app.getHttpServer()).get(`/categories/${categoryId}/products`)
