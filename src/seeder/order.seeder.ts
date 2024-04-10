@@ -11,7 +11,7 @@ import { Role } from '../auth/role/role.entity'
 import { RoleEnum } from '../auth/role/role.enum'
 import { OrderItem } from '../order/order-item.entity'
 
-export class DatabaseSeeder extends Seeder {
+export class OrderSeeder extends Seeder {
   async run(em: EntityManager): Promise<void> {
     const roleUser = new Role(RoleEnum.User)
     const roleAdmin = new Role(RoleEnum.Admin)
@@ -20,10 +20,16 @@ export class DatabaseSeeder extends Seeder {
 
     const user = new UserFactory(em)
       .each((user) => {
-        user.addresses.set(new AddressFactory(em).make(3))
+        user.addresses.add(new AddressFactory(em).makeOne())
         user.roles.add(roleUser)
       })
-      .makeOne()
+      .makeOne({ name: 'user' })
+
+    new UserFactory(em)
+      .each((user) => {
+        user.roles.add(roleAdmin)
+      })
+      .makeOne({ name: 'admin' })  
 
     const category = new CategoryFactory(em)
       .each((category) => {
@@ -32,23 +38,21 @@ export class DatabaseSeeder extends Seeder {
             .each((product) => {
               product.images.add(new ProductImageFactory(em).makeOne())
             })
-            .make(15)
+            .make(3, { price: 5.99 })
         )
       })
-      .make(5)
+      .makeOne()
 
     new OrderFactory(em)
       .each(async (order) => {
         order.customer = user
         order.address = await new AddressFactory(em).createOne()
-
-        for (let i = 0; i < 3; i++) {
-          const productIdx = faker.number.int({ max: category[i].products.length - 1 })
-          order.items.add(new OrderItem({ product: category[i].products[productIdx], amount: i, order, offeredPrice: category[i].products[productIdx].price }))
-        }
+        order.items.add(new OrderItem({
+          amount: 1,
+          order,
+          product: category.products[0]
+        }))
       })
-      .make(3)
-
-    await em.flush()
+      .makeOne()
   }
 }

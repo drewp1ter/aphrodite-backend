@@ -2,16 +2,16 @@ import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from
 import { Reflector } from '@nestjs/core'
 import { JwtService } from '@nestjs/jwt'
 import { Request } from 'express'
-import { SECRET } from '../../config'
+import { config } from '../../config'
 import { ROLES_KEY } from './roles.decorator'
-import { Role } from './role.enum'
+import { RoleEnum } from './role.enum'
 
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector, private jwtService: JwtService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [context.getHandler(), context.getClass()])
+    const requiredRoles = this.reflector.getAllAndOverride<RoleEnum[]>(ROLES_KEY, [context.getHandler(), context.getClass()])
     if (!requiredRoles) {
       return true
     }
@@ -26,7 +26,7 @@ export class RolesGuard implements CanActivate {
     let user
     try {
       user = await this.jwtService.verifyAsync(token, {
-        secret: SECRET
+        secret: config.jwt.secret
       })
       req.user = user
     } catch(e) {

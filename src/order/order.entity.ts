@@ -1,4 +1,4 @@
-import { Entity, EntityRepositoryType, Property, ManyToOne, ManyToMany, EntityDTO, Collection, wrap, types } from '@mikro-orm/core'
+import { Entity, EntityRepositoryType, Property, ManyToOne, OneToMany, EntityDTO, Collection, wrap, types, LoadStrategy } from '@mikro-orm/core'
 import { BaseEntity } from '../shared/entities/base.entity'
 import { User } from '../user/user.entity'
 import { Product } from '../category/product/product.entity'
@@ -22,20 +22,20 @@ export enum OrderStatus {
 export class Order extends BaseEntity {
   [EntityRepositoryType]?: OrderRepository
 
-  constructor(partial: Pick<Order, 'user' | 'address' | 'comment' | 'paymentType'>) { 
+  constructor(partial: Pick<Order, 'customer' | 'address' | 'comment' | 'paymentType'>) { 
     super()
     Object.assign(this, partial)
     this.status = OrderStatus.New
   }
 
   @ManyToOne({ hidden: true })
-  user!: User
+  customer!: User
 
   @ManyToOne({ nullable: true, hidden: true })
   address!: Address | null
 
-  @ManyToMany({ entity: () => Product, pivotEntity: () => OrderItem })
-  products = new Collection<Product>(this)
+  @OneToMany(() => OrderItem, item => item.order)
+  items = new Collection<OrderItem>(this)
 
   @Property({ default: OrderStatus.New, hidden: true })
   status: OrderStatus
@@ -46,16 +46,19 @@ export class Order extends BaseEntity {
   @Property()
   paymentType!: OrderPaymentType
 
-  @Property({ default: '' })
+  @Property({ default: '', hidden: true, lazy: true, index: true })
   confirmationToken!: string
 
   @Property({ persist: false })
   get total() {
-    return this.products.reduce((acc, product) => acc + product.price, 0)
+    const result = this.items.reduce((prev, item) => prev + (item.offeredPrice * item.amount) , 0)
+    return parseFloat(result.toFixed(2))
   }
 
   async toJSON() {
-    return wrap<Order>(this).toObject() as OrderDto
+    const order = wrap<Order>(this).toObject() as OrderDto
+    order.items = this.items.toJSON()
+    return order
   }
 }
 

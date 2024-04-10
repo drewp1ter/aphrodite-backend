@@ -15,7 +15,7 @@ export class Category extends BaseEntity {
     this.updatedAt = new Date()
   }
   
-  @OneToMany(() => Product, (product) => product.category, { orphanRemoval: true })
+  @OneToMany(() => Product, (product) => product.category, { orphanRemoval: true, eager: false })
   products = new Collection<Product>(this)
 
   @Property()

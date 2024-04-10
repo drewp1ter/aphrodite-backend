@@ -17,11 +17,13 @@ export class AddressService {
 
   async create(userId: number, dto: CreateAddressDto) {
     const user = await this.userRepository.findOneOrFail(userId, { populate: ['addresses'] })
-    if (!user.addresses.find((address) => address.city === dto.city && address.address === dto.address)) {
-      const address = new Address(dto)
+    let address = user.addresses.find((address) => address.city === dto.city && address.address === dto.address)
+    if (!address) {
+      address = new Address(dto)
       user.addresses.add(address)
-      this.em.persistAndFlush(user)
+      await this.em.persistAndFlush(user)
     }
+    return user.addresses.getItems().at(-1)
   }
 
   async findAll(userId: number) {

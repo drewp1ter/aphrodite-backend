@@ -4,8 +4,7 @@ import { OrderItemDto } from './order-item.dto'
 import { OrderPaymentType } from '../order.entity'
 
 export class CreateOrderDto {
-  @IsNotEmpty()
-  @IsPhoneNumber()
+  @IsPhoneNumber('RU')
   readonly phone!: string
   
   @IsNotEmpty()

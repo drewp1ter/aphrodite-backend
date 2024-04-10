@@ -2,14 +2,16 @@ import { Module } from '@nestjs/common'
 import { APP_GUARD } from '@nestjs/core'
 import { JwtModule } from '@nestjs/jwt'
 import { RolesGuard } from './role.guard'
-import { SECRET } from '../../config'
+import { config } from '../../config'
 
+const { NODE_ENV } = process.env
+if (NODE_ENV === 'production' && config.jwt.secret === 'changeme') throw new Error('Please change jwt_secret !!!')
 @Module({
   imports: [
     JwtModule.register({
       global: true,
-      secret: SECRET,
-      signOptions: { expiresIn: '30d' }
+      secret: config.jwt.secret,
+      signOptions: { expiresIn: config.jwt.expiresIn }
     })
   ],
   providers: [
@@ -21,5 +23,4 @@ import { SECRET } from '../../config'
   controllers: [],
   exports: []
 })
-
-export class RoeleModule {}
+export class RoleModule {}

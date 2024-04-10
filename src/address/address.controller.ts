@@ -4,7 +4,7 @@ import { ValidationPipe } from '../shared/pipes/validation.pipe'
 import { AddressService } from './address.service'
 import { User } from '../user/user.decorator'
 import { CreateAddressDto } from './dto'
-import { Roles } from '../user/role/roles.decorator'
+import { Roles } from '../auth/role/roles.decorator'
 
 @Roles('user')
 @Controller('addresses')

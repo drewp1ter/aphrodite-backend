@@ -1,9 +1,9 @@
 import { Controller, Post, Body, UsePipes, BadRequestException, ParseIntPipe, Get, Param, Delete, Query, Patch } from '@nestjs/common'
-import { ForeignKeyConstraintViolationException } from '@mikro-orm/mysql'
+import { ForeignKeyConstraintViolationException, CheckConstraintViolationException } from '@mikro-orm/mysql'
 import { ValidationPipe } from '../shared/pipes/validation.pipe'
 import { OrderService } from './order.service'
 import { CreateOrderDto } from './dto/create-order.dto'
-import { Roles } from '../user/role/roles.decorator'
+import { Roles } from '../auth/role/roles.decorator'
 import { User } from '../user/user.decorator'
 import { OrderItemDto } from './dto/order-item.dto'
 
@@ -21,7 +21,10 @@ export class OrderController {
       if (e instanceof ForeignKeyConstraintViolationException) {
         throw new BadRequestException('Product not found.')
       }
-      throw e
+      if (e instanceof CheckConstraintViolationException) {
+        throw new BadRequestException('Item amount is incorrect.')
+      }
+      throw new BadRequestException()
     }
   }
 
@@ -34,11 +37,11 @@ export class OrderController {
   @Get('my')
   @Roles('user')
   async findAllByUser(
-    @User('id') userId: number,
+    @User('id') customerId: number,
     @Query('page', new ParseIntPipe({ optional: true })) page: number,
     @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize: number
   ) {
-    return this.orderService.findAllByUser({ userId, page, pageSize })
+    return this.orderService.findAllByUser({ customerId, page, pageSize })
   }
 
   @Get()
@@ -52,7 +55,7 @@ export class OrderController {
 
   @Post(':orderId')
   @Roles('admin')
-  async addProduct(@Param(':orderId', ParseIntPipe) orderId: number, @Body('product') orderItemDto: OrderItemDto) {
+  async addProduct(@Param(':orderId', ParseIntPipe) orderId: number, @Body() orderItemDto: OrderItemDto) {
     return this.orderService.addProduct({ orderId, productId: orderItemDto.productId, amount: orderItemDto.amount })
   }
 
