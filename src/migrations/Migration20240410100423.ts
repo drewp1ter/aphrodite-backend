@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20240410085121 extends Migration {
+export class Migration20240410100423 extends Migration {
 
   async up(): Promise<void> {
     this.addSql('create table `address` (`id` int unsigned not null auto_increment primary key, `created_at` datetime not null, `updated_at` datetime not null, `city` varchar(255) not null, `address` text not null) default character set utf8mb4 engine = InnoDB;');
@@ -18,7 +18,7 @@ export class Migration20240410085121 extends Migration {
     this.addSql('create table `role` (`id` int unsigned not null auto_increment primary key, `role` enum(\'user\', \'admin\') not null) default character set utf8mb4 engine = InnoDB;');
     this.addSql('alter table `role` add unique `role_role_unique`(`role`);');
 
-    this.addSql('create table `user` (`id` int unsigned not null auto_increment primary key, `created_at` datetime not null, `updated_at` datetime not null, `name` varchar(255) not null, `email` varchar(255) not null default \'\', `phone` varchar(255) not null, `password` varchar(255) not null, `is_email_confirmed` tinyint(1) not null default false, `is_phone_confirmed` tinyint(1) not null default false) default character set utf8mb4 engine = InnoDB;');
+    this.addSql('create table `user` (`id` int unsigned not null auto_increment primary key, `created_at` datetime not null, `updated_at` datetime not null, `name` varchar(255) not null, `email` varchar(255) null, `phone` varchar(255) not null, `password` varchar(255) not null, `is_email_confirmed` tinyint(1) not null default false, `is_phone_confirmed` tinyint(1) not null default false) default character set utf8mb4 engine = InnoDB;');
     this.addSql('alter table `user` add unique `user_email_unique`(`email`);');
     this.addSql('alter table `user` add unique `user_phone_unique`(`phone`);');
 

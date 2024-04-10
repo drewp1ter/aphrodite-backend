@@ -40,13 +40,13 @@ export class OrderService {
       const products = await this.productRepository.findAll({ fields: ['id', 'price'], where: { id: { $in: itemIds } } })
 
       const order = new Order({ customer, address, comment: dto.comment, paymentType: dto.paymentType })
-      for (const product of products) {
-        const amount = dto.items.find((item) => item.productId === product.id)!.amount
+      for (const item of dto.items) {
+        const product = products.find(product => product.id === item.productId)
         em.create(OrderItem, {
           order,
-          product: product.id,
-          amount,
-          offeredPrice: product.price
+          product: item.productId,
+          amount: item.amount,
+          offeredPrice: product?.price ?? 0
         })
       }
 

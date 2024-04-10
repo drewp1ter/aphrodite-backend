@@ -1,5 +1,5 @@
 import { Controller, Post, Body, UsePipes, BadRequestException, ParseIntPipe, Get, Param, Delete, Query, Patch } from '@nestjs/common'
-import { ForeignKeyConstraintViolationException } from '@mikro-orm/mysql'
+import { ForeignKeyConstraintViolationException, CheckConstraintViolationException } from '@mikro-orm/mysql'
 import { ValidationPipe } from '../shared/pipes/validation.pipe'
 import { OrderService } from './order.service'
 import { CreateOrderDto } from './dto/create-order.dto'
@@ -21,7 +21,10 @@ export class OrderController {
       if (e instanceof ForeignKeyConstraintViolationException) {
         throw new BadRequestException('Product not found.')
       }
-      throw e
+      if (e instanceof CheckConstraintViolationException) {
+        throw new BadRequestException('Item amount is incorrect.')
+      }
+      throw new BadRequestException()
     }
   }
 

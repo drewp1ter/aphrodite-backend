@@ -33,23 +33,72 @@ describe('Order', () => {
 
   it('POST /orders => should create the new order', async () => {
     const products = await orm.em.findAll(Product)
-    const res = await request(app.getHttpServer()).post(`/orders`).send({
-      phone: faker.helpers.fromRegExp('\+79[0-9]{9}'),
-      name: faker.person.fullName(),
-      comment: faker.lorem.words(8),
-      paymentType: 'online',
-      address: {
-        city: faker.location.city(),
-        address: faker.location.streetAddress()
-      },
-      items: products.map((product, idx) => ({ productId: product.id, amount: idx + 1 }))
-    })
+    const res = await request(app.getHttpServer())
+      .post(`/orders`)
+      .send({
+        phone: faker.helpers.fromRegExp('+79[0-9]{9}'),
+        name: faker.person.fullName(),
+        comment: faker.lorem.words(8),
+        paymentType: 'online',
+        address: {
+          city: faker.location.city(),
+          address: faker.location.streetAddress()
+        },
+        items: products.map((product, idx) => ({ productId: product.id, amount: idx + 1 }))
+      })
     const ordersCount = await orm.em.count(Order)
     expect(res.status).toBe(201)
     expect(ordersCount).toBe(2)
-    const createdOrder = await (await orm.em.findAll(Order, { populate: ['items', 'items.product.images'], orderBy: { id: 'DESC' }, limit: 1 })).at(0)?.toJSON()
+    const createdOrder = await (await orm.em.findAll(Order, { populate: ['items', 'items.product.images'], orderBy: { id: 'DESC' }, limit: 1 }))
+      .at(0)
+      ?.toJSON()
     expect(res.body).toEqual(createdOrder)
     expect(res.body.total.toString()).toBe('35.94')
+  })
+
+  it("POST /orders => shouldn't create the new order with bad item amount", async () => {
+    const products = await orm.em.findAll(Product)
+    const res = await request(app.getHttpServer())
+      .post(`/orders`)
+      .send({
+        phone: faker.helpers.fromRegExp('+79[0-9]{9}'),
+        name: faker.person.fullName(),
+        comment: faker.lorem.words(8),
+        paymentType: 'online',
+        address: {
+          city: faker.location.city(),
+          address: faker.location.streetAddress()
+        },
+        items: products.map((product) => ({ productId: product.id, amount: 0 }))
+      })
+    expect(res.status).toBe(400)
+    expect(res.body).toEqual({
+      error: 'Bad Request',
+      message: 'Item amount is incorrect.',
+      statusCode: 400
+    })
+  })
+
+  it("POST /orders => shouldn't create the new order with bad productId", async () => {
+    const res = await request(app.getHttpServer())
+      .post(`/orders`)
+      .send({
+        phone: faker.helpers.fromRegExp('+79[0-9]{9}'),
+        name: faker.person.fullName(),
+        comment: faker.lorem.words(8),
+        paymentType: 'online',
+        address: {
+          city: faker.location.city(),
+          address: faker.location.streetAddress()
+        },
+        items: [{ productId: 999, amount: 1 }]
+      })
+    expect(res.body).toEqual({
+      error: 'Bad Request',
+      message: 'Product not found.',
+      statusCode: 400
+    })
+    expect(res.status).toBe(400)
   })
 
   afterAll(async () => {

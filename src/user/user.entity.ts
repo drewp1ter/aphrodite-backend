@@ -25,7 +25,7 @@ export class User extends BaseEntity {
   @Property()
   name!: string
 
-  @Property({ unique: true, default: '' })
+  @Property({ unique: true, nullable: true, serializer: (email) => email ?? '' })
   email!: string
 
   @Property({ unique: true })
@@ -46,5 +46,4 @@ export class User extends BaseEntity {
   }
 }
 
-interface UserDTO extends EntityDTO<User> {
-}
+interface UserDTO extends EntityDTO<User> {}
