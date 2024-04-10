@@ -34,11 +34,11 @@ export class OrderController {
   @Get('my')
   @Roles('user')
   async findAllByUser(
-    @User('id') userId: number,
+    @User('id') customerId: number,
     @Query('page', new ParseIntPipe({ optional: true })) page: number,
     @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize: number
   ) {
-    return this.orderService.findAllByUser({ userId, page, pageSize })
+    return this.orderService.findAllByUser({ customerId, page, pageSize })
   }
 
   @Get()

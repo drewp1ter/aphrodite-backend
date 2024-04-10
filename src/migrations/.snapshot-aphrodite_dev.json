@@ -210,43 +210,43 @@
         },
         "squirrels": {
           "name": "squirrels",
-          "type": "float",
+          "type": "int",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
           "default": "0",
-          "mappedType": "float"
+          "mappedType": "integer"
         },
         "fats": {
           "name": "fats",
-          "type": "float",
+          "type": "int",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
           "default": "0",
-          "mappedType": "float"
+          "mappedType": "integer"
         },
         "carbohydrates": {
           "name": "carbohydrates",
-          "type": "float",
+          "type": "int",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
           "default": "0",
-          "mappedType": "float"
+          "mappedType": "integer"
         },
         "flags": {
           "name": "flags",
-          "type": "smallint",
+          "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
           "default": "0",
-          "mappedType": "smallint"
+          "mappedType": "string"
         },
         "calories": {
           "name": "calories",
@@ -635,8 +635,8 @@
           "length": 0,
           "mappedType": "datetime"
         },
-        "user_id": {
-          "name": "user_id",
+        "customer_id": {
+          "name": "customer_id",
           "type": "int",
           "unsigned": true,
           "autoincrement": false,
@@ -696,10 +696,10 @@
       "indexes": [
         {
           "columnNames": [
-            "user_id"
+            "customer_id"
           ],
           "composite": false,
-          "keyName": "order_user_id_index",
+          "keyName": "order_customer_id_index",
           "constraint": false,
           "primary": false,
           "unique": false
@@ -710,6 +710,16 @@
           ],
           "composite": false,
           "keyName": "order_address_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "confirmation_token"
+          ],
+          "composite": false,
+          "keyName": "order_confirmation_token_index",
           "constraint": false,
           "primary": false,
           "unique": false
@@ -727,10 +737,10 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "order_user_id_foreign": {
-          "constraintName": "order_user_id_foreign",
+        "order_customer_id_foreign": {
+          "constraintName": "order_customer_id_foreign",
           "columnNames": [
-            "user_id"
+            "customer_id"
           ],
           "localTableName": "order",
           "referencedColumnNames": [
@@ -784,6 +794,15 @@
           "nullable": false,
           "default": "1",
           "mappedType": "integer"
+        },
+        "offered_price": {
+          "name": "offered_price",
+          "type": "float",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "float"
         }
       },
       "name": "order_item",
@@ -826,6 +845,12 @@
           "expression": "amount > 0",
           "definition": "check ((amount > 0))",
           "columnName": "amount"
+        },
+        {
+          "name": "order_item_offered_price_check",
+          "expression": "offered_price >= 0",
+          "definition": "check ((offered_price >= 0))",
+          "columnName": "offered_price"
         }
       ],
       "foreignKeys": {

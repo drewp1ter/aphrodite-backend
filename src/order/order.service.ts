@@ -12,6 +12,8 @@ import { UserAddress } from '../user/user-address.entity'
 import { OrderRepository } from './order.repository'
 import { OrderStatus } from './order.entity'
 import { config } from '../config'
+import { Product } from '../category/product/product.entity'
+import { ProductRepository } from '../category/product/product.repository'
 @Injectable()
 export class OrderService {
   constructor(
@@ -21,40 +23,47 @@ export class OrderService {
     @InjectRepository(User)
     private readonly userRepository: UserRepository,
     @InjectRepository(Address)
-    private readonly addressRepository: AddressRepository
+    private readonly addressRepository: AddressRepository,
+    @InjectRepository(Product)
+    private readonly productRepository: ProductRepository
   ) {}
 
   async create(dto: CreateOrderDto) {
     const order = await this.em.transactional(async (em: EntityManager) => {
-      let user = await this.userRepository.findOne({ phone: dto.phone })
-      user ??= new User({ name: dto.name, phone: dto.phone })
+      let customer = await this.userRepository.findOne({ phone: dto.phone })
+      customer ??= new User({ name: dto.name, phone: dto.phone })
 
       let address = await this.addressRepository.findOne({ city: dto.address.city, address: dto.address.address })
       address ??= new Address(dto.address)
 
-      const order = new Order({ user, address, comment: dto.comment, paymentType: dto.paymentType })
-      for (const item of dto.items) {
+      const itemIds = dto.items.map((item) => item.productId)
+      const products = await this.productRepository.findAll({ fields: ['id', 'price'], where: { id: { $in: itemIds } } })
+
+      const order = new Order({ customer, address, comment: dto.comment, paymentType: dto.paymentType })
+      for (const product of products) {
+        const amount = dto.items.find((item) => item.productId === product.id)!.amount
         em.create(OrderItem, {
           order,
-          product: item.productId,
-          amount: item.amount
+          product: product.id,
+          amount,
+          offeredPrice: product.price
         })
       }
 
-      let userAddress = await em.count(UserAddress, { user, address })
+      let userAddress = await em.count(UserAddress, { user: customer, address })
       if (!userAddress) {
-        em.create(UserAddress, { user, address })
+        em.create(UserAddress, { user: customer, address })
       }
 
       return order
     })
 
-    await this.em.refresh(order, { populate: ['products'] })
+    await this.em.refresh(order, { populate: ['items'] })
     return order!.toJSON()
   }
 
-  async findOne(orderId: number, userId: number) {
-    const order = await this.orderRepository.findOneOrFail({ id: orderId, user: userId })
+  async findOne(orderId: number, customerId: number) {
+    const order = await this.orderRepository.findOneOrFail({ id: orderId, customer: customerId })
     return order.toJSON()
   }
 
@@ -63,17 +72,19 @@ export class OrderService {
     return this.orderRepository.findAndCount({}, { limit: pageSize, offset, orderBy: { createdAt: 'DESC' } })
   }
 
-  async findAllByUser({ userId, page = 1, pageSize = config.defaultPageSize }: FindAllByUserProps) {
+  async findAllByUser({ customerId, page = 1, pageSize = config.defaultPageSize }: FindAllByUserProps) {
     const offset = (page - 1) * pageSize
-    return this.orderRepository.findAndCount({ user: userId }, { limit: pageSize, offset, orderBy: { createdAt: 'DESC' } })
+    return this.orderRepository.findAndCount({ customer: customerId }, { limit: pageSize, offset, orderBy: { createdAt: 'DESC' } })
   }
 
   async addProduct({ orderId, productId, amount = 1 }: AddProductProps) {
     try {
+      const product = await this.productRepository.findOneOrFail(productId, { fields: ['id', 'price'] })
       const orderItem = this.em.create(OrderItem, {
         order: orderId,
-        product: productId,
-        amount
+        product: product.id,
+        amount,
+        offeredPrice: product.price
       })
 
       this.em.persist(orderItem)
@@ -105,7 +116,7 @@ export class OrderService {
 }
 
 export interface FindAllByUserProps {
-  userId: number
+  customerId: number
   page?: number
   pageSize?: number
 }

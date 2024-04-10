@@ -8,7 +8,8 @@ import { CategoryFactory } from '../category/category.factory'
 import { OrderFactory } from '../order/order.factory'
 import { ProductImageFactory } from '../category/product/product-image/product-image.factory'
 import { Role } from '../auth/role/role.entity'
-import { Role as RoleEnum } from '../auth/role/role.enum'
+import { RoleEnum } from '../auth/role/role.enum'
+import { OrderItem } from '../order/order-item.entity'
 
 export class DatabaseSeeder extends Seeder {
   async run(em: EntityManager): Promise<void> {
@@ -38,12 +39,12 @@ export class DatabaseSeeder extends Seeder {
 
     new OrderFactory(em)
       .each(async (order) => {
-        order.user = user
+        order.customer = user
         order.address = await new AddressFactory(em).createOne()
 
         for (let i = 0; i < 3; i++) {
           const productIdx = faker.number.int({ max: category[i].products.length - 1 })
-          order.products.add(category[i].products[productIdx])
+          order.items.add(new OrderItem({ product: category[i].products[productIdx], amount: i, order, offeredPrice: category[i].products[productIdx].price }))
         }
       })
       .make(3)

@@ -1,4 +1,4 @@
-import { Entity, EntityRepositoryType, Property, ManyToOne, EntityDTO, ManyToMany, Collection, wrap, Index, types, Check, OneToMany, OneToOne } from '@mikro-orm/core'
+import { Entity, EntityRepositoryType, Property, ManyToOne, EntityDTO, ManyToMany, Collection, wrap, Index, types, Check, OneToMany, raw, sql } from '@mikro-orm/core'
 import { BaseEntity } from '../../shared/entities/base.entity'
 import { Category } from '../category.entity'
 import { Order } from '../../order/order.entity'
@@ -26,10 +26,7 @@ export class Product extends BaseEntity {
   @ManyToOne({ hidden: true })
   category!: Category
 
-  @ManyToMany({ entity: () => Order, mappedBy: 'products', hidden: true, eager: false })
-  orders = new Collection<Order>(this)
-
-  @OneToMany(() => ProductImage, image => image.product, { orphanRemoval: true, eager: false })
+  @OneToMany(() => ProductImage, image => image.product, { orphanRemoval: true, eager: true })
   images = new Collection<ProductImage>(this)
 
   @Property()
@@ -39,16 +36,16 @@ export class Product extends BaseEntity {
   @Property({ default: '', length: 8192 })
   description: string
 
-  @Property({ type: types.float, default: 0 })
+  @Property({ default: 0 })
   squirrels: number
 
-  @Property({ type: types.float, default: 0 })
+  @Property({ default: 0 })
   fats: number
 
-  @Property({ type: types.float, default: 0 })
+  @Property({ default: 0 })
   carbohydrates: number
 
-  @Property({ type: types.smallint, default: 0 })
+  @Property({ default: 0 })
   flags: ProductFlags
 
   @Property({ default: 0 })
@@ -59,7 +56,9 @@ export class Product extends BaseEntity {
   price: number
 
   toJSON() {
-    return wrap<Product>(this).toObject() as ProductDto
+    const product = wrap<Product>(this).toObject() as ProductDto
+    product.images = this.images.toJSON()
+    return product
   }
 }
 

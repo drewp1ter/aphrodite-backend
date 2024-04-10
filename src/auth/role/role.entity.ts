@@ -1,5 +1,5 @@
 import { Entity, PrimaryKey, Enum, ManyToMany, Collection } from '@mikro-orm/core'
-import { Role as RoleEnum } from './role.enum'
+import { RoleEnum } from './role.enum'
 import { User } from '../../user/user.entity'
 
 @Entity()

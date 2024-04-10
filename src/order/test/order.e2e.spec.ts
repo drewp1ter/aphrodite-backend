@@ -7,6 +7,7 @@ import mikroConfig from '../../mikro-orm.config'
 import { AppModule } from '../../app.module'
 import { OrderSeeder } from '../../seeder/order.seeder'
 import { Product } from '../../category/product/product.entity'
+import { Order } from '../order.entity'
 
 describe('Order', () => {
   let app: INestApplication
@@ -43,8 +44,12 @@ describe('Order', () => {
       },
       items: products.map((product, idx) => ({ productId: product.id, amount: idx + 1 }))
     })
-    expect(res.body).toEqual({})
-    expect(res.status).toBe(200)
+    const ordersCount = await orm.em.count(Order)
+    expect(res.status).toBe(201)
+    expect(ordersCount).toBe(2)
+    const createdOrder = await (await orm.em.findAll(Order, { populate: ['items', 'items.product.images'], orderBy: { id: 'DESC' }, limit: 1 })).at(0)?.toJSON()
+    expect(res.body).toEqual(createdOrder)
+    expect(res.body.total.toString()).toBe('35.94')
   })
 
   afterAll(async () => {

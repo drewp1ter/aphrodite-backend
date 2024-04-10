@@ -4,7 +4,7 @@ import { EntityManager, wrap } from '@mikro-orm/core'
 import { CreateUserDto, UpdateUserDto } from './dto'
 import { User } from './user.entity'
 import { Role } from '../auth/role/role.entity'
-import { Role as RoleEnum } from '../auth/role/role.enum'
+import { RoleEnum } from '../auth/role/role.enum'
 import { IUserData } from './user.interface'
 import { UserRepository } from './user.repository'
 

@@ -19,7 +19,7 @@ export class User extends BaseEntity {
   @ManyToMany({ entity: () => Role, eager: true })
   roles = new Collection<Role>(this)
 
-  @ManyToMany({ entity: () => Address, pivotEntity: () => UserAddress, eager: false })
+  @ManyToMany({ entity: () => Address, pivotEntity: () => UserAddress, eager: false, owner: true })
   addresses = new Collection<Address>(this)
 
   @Property()
