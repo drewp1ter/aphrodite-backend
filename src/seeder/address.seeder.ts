@@ -10,7 +10,7 @@ export class AddressSeeder extends Seeder {
     const roleUser = new Role(RoleEnum.User)
     const roleAdmin = new Role(RoleEnum.Admin)
 
-    em.persist(roleAdmin).persist(roleUser)
+    em.persist([roleAdmin, roleUser])
 
     new UserFactory(em)
       .each((user) => {

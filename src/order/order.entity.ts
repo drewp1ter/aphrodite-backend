@@ -31,7 +31,7 @@ export class Order extends BaseEntity {
   @ManyToOne({ hidden: true })
   customer!: User
 
-  @ManyToOne({ nullable: true, hidden: true })
+  @ManyToOne({ nullable: true })
   address!: Address | null
 
   @OneToMany(() => OrderItem, item => item.order, { eager: true })

@@ -39,22 +39,27 @@ export class OrderService {
       const itemIds = dto.items.map((item) => item.productId)
       const products = await this.productRepository.findAll({ fields: ['id', 'price'], where: { id: { $in: itemIds } } })
 
-      const order = new Order({ customer, address, comment: dto.comment, paymentType: dto.paymentType })
-      for (const item of dto.items) {
-        const product = products.find((product) => product.id === item.productId)
-        em.create(OrderItem, {
-          order,
-          product: item.productId,
+      const createdItems = dto.items.map((item) => {
+        const price = products.find((product) => product.id === item.productId)?.price ?? 0
+        return new OrderItem({
+          product: em.getReference(Product, item.productId),
           amount: item.amount,
-          offeredPrice: product?.price ?? 0
+          offeredPrice: price
         })
-      }
+      })
+
+      const order = new Order({ customer, address, comment: dto.comment, paymentType: dto.paymentType })
+      order.items.set(createdItems)
+
+      em.persist([address, customer, order])
 
       let userAddress = await em.count(UserAddress, { user: customer, address })
       if (!userAddress) {
-        em.create(UserAddress, { user: customer, address })
+        const createdAddress = em.create(UserAddress, { user: customer, address })
+        em.persist(createdAddress)
       }
 
+      await em.flush()
       return order
     })
 
@@ -63,7 +68,7 @@ export class OrderService {
   }
 
   async findOne(orderId: number, customerId: number) {
-    const order = await this.orderRepository.findOneOrFail({ id: orderId, customer: customerId })
+    const order = await this.orderRepository.findOneOrFail({ id: orderId, customer: customerId }, { populate: ['address'] })
     return order.toJSON()
   }
 
@@ -85,27 +90,20 @@ export class OrderService {
 
   async addProduct({ orderId, productId, amount = 1 }: AddProductProps) {
     try {
-      const product = await this.productRepository.findOneOrFail(productId, { fields: ['id', 'price'] })
-      const orderItem = this.em.create(OrderItem, {
-        order: orderId,
-        product: product.id,
-        amount,
-        offeredPrice: product.price
+      const order = await this.em.transactional(async (em) => {
+        const order = await this.orderRepository.findOneOrFail(orderId, { populate: ['address'], ctx: em })
+        const product = await this.productRepository.findOneOrFail(productId, { ctx: em })
+        order.items.add(new OrderItem({ product, amount, offeredPrice: product.price }))
+        await em.persistAndFlush(order)
+        return order
       })
-
-      this.em.persist(orderItem)
+      return order.toJSON()
     } catch (e) {
       if (e instanceof UniqueConstraintViolationException) {
         this.em.nativeUpdate(OrderItem, { order: orderId, product: productId }, { amount })
       }
       throw e
     }
-
-    const order = await this.orderRepository.findOneOrFail({ id: orderId }, { populate: ['items'] })
-    const items = await this.em.findAll(OrderItem, { where: { order: 1 } })
-    console.log(items)
-    console.log(order.toJSON())
-    return order.toJSON()
   }
 
   async removeProduct({ orderId, productId }: Omit<AddProductProps, 'amount'>) {

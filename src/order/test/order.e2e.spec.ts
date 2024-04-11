@@ -8,8 +8,10 @@ import mikroConfig from '../../mikro-orm.config'
 import { AppModule } from '../../app.module'
 import { OrderSeeder } from '../../seeder/order.seeder'
 import { Product } from '../../category/product/product.entity'
-import { Order } from '../order.entity'
+import { Order, OrderStatus } from '../order.entity'
 import { User } from '../../user/user.entity'
+import { OrderItem } from '../order-item.entity'
+import { Address } from '../../address/address.entity'
 
 describe('Order', () => {
   let app: INestApplication
@@ -38,9 +40,9 @@ describe('Order', () => {
     user = await orm.em.findOneOrFail(User, { name: 'user' })
     admin = await orm.em.findOneOrFail(User, { name: 'admin' })
 
-    const jwt_service = moduleRef.get(JwtService)
-    jwtUser = jwt_service.sign({ id: user.id, roles: user.roles.map((role) => role.role) })
-    jwtAdmin = jwt_service.sign({ id: admin.id, roles: admin.roles.map((role) => role.role) })
+    const jwtService = moduleRef.get(JwtService)
+    jwtUser = jwtService.sign({ id: user.id, roles: user.roles.map((role) => role.role) })
+    jwtAdmin = jwtService.sign({ id: admin.id, roles: admin.roles.map((role) => role.role) })
   })
 
   it('POST /orders => should create the new order', async () => {
@@ -61,7 +63,9 @@ describe('Order', () => {
     const ordersCount = await orm.em.count(Order)
     expect(res.status).toBe(201)
     expect(ordersCount).toBe(3)
-    const createdOrder = (await orm.em.findAll(Order)).at(-1)?.toJSON()
+    const createdOrder = (await orm.em.findAll(Order, { populate: ['address'] })).at(-1)!.toJSON()
+    res.body.address.createdAt = createdOrder.address!.createdAt
+    res.body.address.updatedAt = createdOrder.address!.updatedAt
     expect(res.body).toEqual(createdOrder)
     expect(res.body.total.toString()).toBe('35.94')
   })
@@ -146,9 +150,101 @@ describe('Order', () => {
   })
 
   it('POST /orders/:orderId => should add product by admin', async () => {
-    const res = await request(app.getHttpServer()).post(`/orders/1`).send({ productId: 3, amount: 1 }).set('Authorization', `Bearer ${jwtAdmin}`)
-    // expect(res.status).toBe(201)
-    expect(res.body).toEqual({})
+    const orderId = 1
+    const amount = 16
+    const productId = 2
+    const res = await request(app.getHttpServer()).post(`/orders/${orderId}`).send({ productId, amount }).set('Authorization', `Bearer ${jwtAdmin}`)
+    expect(res.status).toBe(201)
+    expect(await orm.em.count(OrderItem, { order: orderId })).toBe(2)
+    expect(await orm.em.count(OrderItem, { order: orderId, amount })).toBe(1)
+  })
+
+  it("POST /orders/:orderId => shouldn't add product by user", async () => {
+    const orderId = 1
+    const amount = 16
+    const productId = 2
+    const res = await request(app.getHttpServer()).post(`/orders/${orderId}`).send({ productId, amount }).set('Authorization', `Bearer ${jwtUser}`)
+    expect(res.status).toBe(403)
+    expect(res.body).toEqual({
+      error: 'Forbidden',
+      message: 'Forbidden resource',
+      statusCode: 403
+    })
+  })
+
+  it("POST /orders/:orderId => shouldn't add product by user", async () => {
+    const orderId = 1
+    const amount = 16
+    const productId = 2
+    const res = await request(app.getHttpServer()).post(`/orders/${orderId}`).send({ productId, amount }).set('Authorization', `Bearer ${jwtUser}`)
+    expect(res.status).toBe(403)
+    expect(res.body).toEqual({
+      error: 'Forbidden',
+      message: 'Forbidden resource',
+      statusCode: 403
+    })
+  })
+
+  it("DELETE /orders/:orderId/:productId => should delete product by admin", async () => {
+    const orderId = 1
+    const productId = 1
+    const res = await request(app.getHttpServer()).delete(`/orders/${orderId}/${productId}`).set('Authorization', `Bearer ${jwtAdmin}`)
+    expect(res.status).toBe(200)
+  })
+
+  it("DELETE /orders/:orderId/:productId => shouldn\'t delete product by user", async () => {
+    const orderId = 1
+    const productId = 1
+    const res = await request(app.getHttpServer()).delete(`/orders/${orderId}/${productId}`).set('Authorization', `Bearer ${jwtUser}`)
+    expect(res.status).toBe(403)
+    expect(res.body).toEqual({
+      error: 'Forbidden',
+      message: 'Forbidden resource',
+      statusCode: 403
+    })
+  })
+
+  it("DELETE /orders/:orderId => should delete order by admin", async () => {
+    const orderId = 1
+    const addressCount = await orm.em.count(Address)
+    const userCount = await orm.em.count(User)
+    const res = await request(app.getHttpServer()).delete(`/orders/${orderId}`).set('Authorization', `Bearer ${jwtAdmin}`)
+    expect(res.status).toBe(200)
+    expect(await orm.em.count(OrderItem, { order: orderId })).toBe(0)
+    expect(await orm.em.count(Address)).toBe(addressCount)
+    expect(await orm.em.count(User)).toBe(userCount)
+  })
+
+  it("DELETE /orders/:orderId => shouldn\'t delete order by user", async () => {
+    const orderId = 2
+    const res = await request(app.getHttpServer()).delete(`/orders/${orderId}`).set('Authorization', `Bearer ${jwtUser}`)
+    expect(res.status).toBe(403)
+    expect(res.body).toEqual({
+      error: 'Forbidden',
+      message: 'Forbidden resource',
+      statusCode: 403
+    })
+  })
+
+  it("PATCH /orders/confirm/:orderId => should update order status by admin", async () => {
+    const orderId = 3
+    const notConfirmed = await orm.em.count(Order, { id: orderId, status: OrderStatus.New })
+    expect(notConfirmed).toBe(1)
+    const res = await request(app.getHttpServer()).patch(`/orders/confirm/${orderId}`).set('Authorization', `Bearer ${jwtAdmin}`)
+    expect(res.status).toBe(200)
+    const confirmed = await orm.em.count(Order, { id: orderId, status: OrderStatus.Confirmed })
+    expect(confirmed).toBe(1)
+  })
+
+  it("PATCH /orders/confirm/:orderId => shouldn\'t update order status by user", async () => {
+    const orderId = 3
+    const res = await request(app.getHttpServer()).patch(`/orders/confirm/${orderId}`).set('Authorization', `Bearer ${jwtUser}`)
+    expect(res.status).toBe(403)
+    expect(res.body).toEqual({
+      error: 'Forbidden',
+      message: 'Forbidden resource',
+      statusCode: 403
+    })
   })
 
   afterAll(async () => {

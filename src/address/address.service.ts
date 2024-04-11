@@ -21,6 +21,7 @@ export class AddressService {
     if (!address) {
       address = new Address(dto)
       user.addresses.add(address)
+      this.em.persist(address)
       await this.em.persistAndFlush(user)
     }
     return user.addresses.getItems().at(-1)

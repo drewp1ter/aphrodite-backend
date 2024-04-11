@@ -72,7 +72,7 @@ export class OrderController {
     return this.orderService.delete(orderId)
   }
 
-  @Patch(':orderId')
+  @Patch('confirm/:orderId')
   @Roles('admin')
   async confirm(@Param('orderId', ParseIntPipe) orderId: number) {
     return this.orderService.confirm(orderId)

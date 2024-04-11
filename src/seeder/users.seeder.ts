@@ -18,7 +18,7 @@ export class UsersSeeder extends Seeder {
     const user = new UserFactory(em).makeEntity()
     user.roles.add(userRole)
 
-    await em.persistAndFlush(admin)
-    await em.persistAndFlush(user)
+    em.persist([admin, user])
+    await em.flush()
   }
 }
