@@ -67,7 +67,7 @@ describe('Order', () => {
     res.body.address.createdAt = createdOrder.address!.createdAt
     res.body.address.updatedAt = createdOrder.address!.updatedAt
     expect(res.body).toEqual(createdOrder)
-    expect(res.body.total.toString()).toBe('35.94')
+    expect(res.body.total.toString()).toBe('36')
   })
 
   it("POST /orders => shouldn't create the new order with bad item amount", async () => {

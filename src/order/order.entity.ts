@@ -52,7 +52,7 @@ export class Order extends BaseEntity {
   @Property({ persist: false })
   get total() {
     const result = this.items.reduce((prev, item) => prev + (item.offeredPrice * item.amount) , 0)
-    return parseFloat(result.toFixed(2))
+    return result.toFixed(0)
   }
 
   toJSON() {
