@@ -41,7 +41,7 @@ export class OrderService {
 
       const order = new Order({ customer, address, comment: dto.comment, paymentType: dto.paymentType })
       for (const item of dto.items) {
-        const product = products.find(product => product.id === item.productId)
+        const product = products.find((product) => product.id === item.productId)
         em.create(OrderItem, {
           order,
           product: item.productId,
@@ -58,7 +58,7 @@ export class OrderService {
       return order
     })
 
-    await this.em.refresh(order, { populate: ['items'] })
+    await this.em.refresh(order)
     return order!.toJSON()
   }
 
@@ -69,12 +69,18 @@ export class OrderService {
 
   async findAll(page: number = 1, pageSize: number = config.defaultPageSize) {
     const offset = (page - 1) * pageSize
-    return this.orderRepository.findAndCount({}, { limit: pageSize, offset, orderBy: { createdAt: 'DESC' } })
+    const [orders, count] = await this.orderRepository.findAndCount({}, { limit: pageSize, offset, orderBy: { createdAt: 'DESC' } })
+    return { orders, count }
   }
 
   async findAllByUser({ customerId, page = 1, pageSize = config.defaultPageSize }: FindAllByUserProps) {
     const offset = (page - 1) * pageSize
-    return this.orderRepository.findAndCount({ customer: customerId }, { limit: pageSize, offset, orderBy: { createdAt: 'DESC' } })
+    const [orders, count] = await this.orderRepository.findAndCount(
+      { customer: customerId },
+      { limit: pageSize, offset, orderBy: { id: 'DESC' }, populate: ['address'] }
+    )
+
+    return { orders, count }
   }
 
   async addProduct({ orderId, productId, amount = 1 }: AddProductProps) {
@@ -95,7 +101,10 @@ export class OrderService {
       throw e
     }
 
-    const order = await this.orderRepository.findOneOrFail(orderId)
+    const order = await this.orderRepository.findOneOrFail({ id: orderId }, { populate: ['items'] })
+    const items = await this.em.findAll(OrderItem, { where: { order: 1 } })
+    console.log(items)
+    console.log(order.toJSON())
     return order.toJSON()
   }
 

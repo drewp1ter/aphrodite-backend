@@ -23,7 +23,7 @@ export class Product extends BaseEntity {
     this.price = partial.price
   }
 
-  @ManyToOne({ hidden: true })
+  @ManyToOne({ hidden: true, lazy: true })
   category!: Category
 
   @OneToMany(() => ProductImage, image => image.product, { orphanRemoval: true, eager: true })

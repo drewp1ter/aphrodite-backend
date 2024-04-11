@@ -12,9 +12,6 @@ export class Address extends BaseEntity {
     Object.assign(this, partial)
   }
 
-  @ManyToMany({ entity: () => User, mappedBy: 'addresses', hidden: true, eager: false })
-  users = new Collection<User>(this)
-
   @Property()
   city!: string
 

@@ -22,7 +22,7 @@ export enum OrderStatus {
 export class Order extends BaseEntity {
   [EntityRepositoryType]?: OrderRepository
 
-  constructor(partial: Pick<Order, 'customer' | 'address' | 'comment' | 'paymentType'>) { 
+  constructor(partial: Partial<Order>) { 
     super()
     Object.assign(this, partial)
     this.status = OrderStatus.New
@@ -34,7 +34,7 @@ export class Order extends BaseEntity {
   @ManyToOne({ nullable: true, hidden: true })
   address!: Address | null
 
-  @OneToMany(() => OrderItem, item => item.order)
+  @OneToMany(() => OrderItem, item => item.order, { eager: true })
   items = new Collection<OrderItem>(this)
 
   @Property({ default: OrderStatus.New, hidden: true })
@@ -55,9 +55,9 @@ export class Order extends BaseEntity {
     return parseFloat(result.toFixed(2))
   }
 
-  async toJSON() {
+  toJSON() {
     const order = wrap<Order>(this).toObject() as OrderDto
-    order.items = this.items.toJSON()
+    order.items = this.items.map(item => item.toJSON())
     return order
   }
 }

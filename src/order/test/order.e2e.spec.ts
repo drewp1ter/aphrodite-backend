@@ -1,6 +1,7 @@
 import request from 'supertest'
 import { faker } from '@faker-js/faker'
 import { MikroORM } from '@mikro-orm/core'
+import { JwtService } from '@nestjs/jwt'
 import { Test } from '@nestjs/testing'
 import { INestApplication } from '@nestjs/common'
 import mikroConfig from '../../mikro-orm.config'
@@ -8,10 +9,15 @@ import { AppModule } from '../../app.module'
 import { OrderSeeder } from '../../seeder/order.seeder'
 import { Product } from '../../category/product/product.entity'
 import { Order } from '../order.entity'
+import { User } from '../../user/user.entity'
 
 describe('Order', () => {
   let app: INestApplication
   let orm: Awaited<ReturnType<typeof MikroORM.init>>
+  let jwtUser: string
+  let jwtAdmin: string
+  let user: User
+  let admin: User
 
   beforeAll(async () => {
     mikroConfig.allowGlobalContext = true
@@ -29,6 +35,12 @@ describe('Order', () => {
     await app.init()
 
     await seeder.seed(OrderSeeder)
+    user = await orm.em.findOneOrFail(User, { name: 'user' })
+    admin = await orm.em.findOneOrFail(User, { name: 'admin' })
+
+    const jwt_service = moduleRef.get(JwtService)
+    jwtUser = jwt_service.sign({ id: user.id, roles: user.roles.map((role) => role.role) })
+    jwtAdmin = jwt_service.sign({ id: admin.id, roles: admin.roles.map((role) => role.role) })
   })
 
   it('POST /orders => should create the new order', async () => {
@@ -48,10 +60,8 @@ describe('Order', () => {
       })
     const ordersCount = await orm.em.count(Order)
     expect(res.status).toBe(201)
-    expect(ordersCount).toBe(2)
-    const createdOrder = await (await orm.em.findAll(Order, { populate: ['items', 'items.product.images'], orderBy: { id: 'DESC' }, limit: 1 }))
-      .at(0)
-      ?.toJSON()
+    expect(ordersCount).toBe(3)
+    const createdOrder = (await orm.em.findAll(Order)).at(-1)?.toJSON()
     expect(res.body).toEqual(createdOrder)
     expect(res.body.total.toString()).toBe('35.94')
   })
@@ -99,6 +109,46 @@ describe('Order', () => {
       statusCode: 400
     })
     expect(res.status).toBe(400)
+  })
+
+  it('GET /orders/my => should get user orders', async () => {
+    const res = await request(app.getHttpServer()).get(`/orders/my`).set('Authorization', `Bearer ${jwtUser}`)
+    expect(res.status).toBe(200)
+    const userOrders = await orm.em.findAll(Order, { where: { customer: user }, orderBy: { id: 'DESC' } })
+    expect(userOrders.length).toBe(2)
+    expect(res.body.orders).toEqual(userOrders.map((order) => order.toJSON()))
+    expect(res.body.count).toBe(2)
+  })
+
+  it("GET /orders/my => shouldn't get any orders", async () => {
+    const res = await request(app.getHttpServer()).get(`/orders/my`)
+    expect(res.status).toBe(401)
+    expect(res.body).toEqual({
+      message: 'Unauthorized',
+      statusCode: 401
+    })
+  })
+
+  it('GET /orders/:orderId => should get user order by id', async () => {
+    const res = await request(app.getHttpServer()).get(`/orders/1`).set('Authorization', `Bearer ${jwtUser}`)
+    expect(res.status).toBe(200)
+    const userOrder = await orm.em.findOneOrFail(Order, { id: 1, customer: user })
+    expect(res.body).toEqual(userOrder.toJSON())
+  })
+
+  it("GET /orders/:orderId => shouldn't get order by id", async () => {
+    const res = await request(app.getHttpServer()).get(`/orders/1`)
+    expect(res.status).toBe(401)
+    expect(res.body).toEqual({
+      message: 'Unauthorized',
+      statusCode: 401
+    })
+  })
+
+  it('POST /orders/:orderId => should add product by admin', async () => {
+    const res = await request(app.getHttpServer()).post(`/orders/1`).send({ productId: 3, amount: 1 }).set('Authorization', `Bearer ${jwtAdmin}`)
+    // expect(res.status).toBe(201)
+    expect(res.body).toEqual({})
   })
 
   afterAll(async () => {

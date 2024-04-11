@@ -28,12 +28,6 @@ export class OrderController {
     }
   }
 
-  @Get(':orderId')
-  @Roles('user')
-  async findOne(@User('id') userId: number, @Param('orderId', ParseIntPipe) orderId: number) {
-    return this.orderService.findOne(orderId, userId)
-  }
-
   @Get('my')
   @Roles('user')
   async findAllByUser(
@@ -42,6 +36,12 @@ export class OrderController {
     @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize: number
   ) {
     return this.orderService.findAllByUser({ customerId, page, pageSize })
+  }
+
+  @Get(':orderId')
+  @Roles('user')
+  async findOne(@User('id') userId: number, @Param('orderId', ParseIntPipe) orderId: number) {
+    return this.orderService.findOne(orderId, userId)
   }
 
   @Get()
@@ -53,9 +53,10 @@ export class OrderController {
     return this.orderService.findAll(page, pageSize)
   }
 
+  @UsePipes(new ValidationPipe())
   @Post(':orderId')
   @Roles('admin')
-  async addProduct(@Param(':orderId', ParseIntPipe) orderId: number, @Body() orderItemDto: OrderItemDto) {
+  async addProduct(@Body() orderItemDto: OrderItemDto, @Param('orderId', ParseIntPipe) orderId: number) {
     return this.orderService.addProduct({ orderId, productId: orderItemDto.productId, amount: orderItemDto.amount })
   }
 

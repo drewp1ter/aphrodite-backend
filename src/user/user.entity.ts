@@ -31,13 +31,13 @@ export class User extends BaseEntity {
   @Property({ unique: true })
   phone!: string
 
-  @Property({ hidden: true })
+  @Property({ hidden: true, lazy: true })
   password: string
 
-  @Property({ hidden: true, default: false })
+  @Property({ hidden: true, default: false, lazy: true })
   isEmailConfirmed!: boolean
 
-  @Property({ hidden: true, default: false })
+  @Property({ hidden: true, default: false, lazy: true })
   isPhoneConfirmed!: boolean
 
   toJSON() {
