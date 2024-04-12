@@ -7,10 +7,10 @@ import { INestApplication } from '@nestjs/common'
 import mikroConfig from '../../mikro-orm.config'
 import { AppModule } from '../../app.module'
 import { OrderSeeder } from '../../seeder/order.seeder'
-import { Product } from '../../category/product/product.entity'
+import { Product } from '../../product/product.entity'
 import { Order, OrderStatus } from '../order.entity'
 import { User } from '../../user/user.entity'
-import { OrderItem } from '../order-item.entity'
+import { OrderItem } from '../../order-item/order-item.entity'
 import { Address } from '../../address/address.entity'
 
 describe('Order', () => {
@@ -64,9 +64,51 @@ describe('Order', () => {
     expect(res.status).toBe(201)
     expect(ordersCount).toBe(3)
     const createdOrder = (await orm.em.findAll(Order, { populate: ['address'] })).at(-1)!.toJSON()
-    res.body.address.createdAt = createdOrder.address!.createdAt
-    res.body.address.updatedAt = createdOrder.address!.updatedAt
-    expect(res.body).toEqual(createdOrder)
+    expect(res.body).toEqual({
+      id: createdOrder.id,
+      createdAt: createdOrder.createdAt,
+      updatedAt: createdOrder.updatedAt,
+      address: {
+        id: createdOrder.address!.id,
+        city: createdOrder.address!.city,
+        address: createdOrder.address!.address,
+        createdAt: expect.anything(),
+        updatedAt: expect.anything()
+      },
+      comment: createdOrder.comment,
+      paymentType: createdOrder.paymentType,
+      items: [
+        {
+          amount: createdOrder.items[0].amount,
+          offeredPrice: createdOrder.items[0].offeredPrice,
+          product: {
+            calories: createdOrder.items[0].product.calories,
+            carbohydrates: createdOrder.items[0].product.carbohydrates,
+            description: createdOrder.items[0].product.description,
+            fats: createdOrder.items[0].product.fats,
+            flags: createdOrder.items[0].product.flags,
+            id: createdOrder.items[0].product.id,
+            images: [
+              {
+                id: createdOrder.items[0].product.images[0].id,
+                type: createdOrder.items[0].product.images[0].type,
+                url: createdOrder.items[0].product.images[0].url,
+                createdAt: expect.anything(),
+                updatedAt: expect.anything()
+              }
+            ],
+            name: createdOrder.items[0].product.name,
+            price: createdOrder.items[0].product.price,
+            squirrels: createdOrder.items[0].product.squirrels,
+            createdAt: expect.anything(),
+            updatedAt: expect.anything()
+          }
+        },
+        { product: createdOrder.items[1].product, amount: createdOrder.items[1].amount, offeredPrice: createdOrder.items[1].offeredPrice },
+        { product: createdOrder.items[2].product, amount: createdOrder.items[2].amount, offeredPrice: createdOrder.items[2].offeredPrice }
+      ],
+      total: createdOrder.total
+    })
     expect(res.body.total.toString()).toBe('36')
   })
 
@@ -118,9 +160,54 @@ describe('Order', () => {
   it('GET /orders/my => should get user orders', async () => {
     const res = await request(app.getHttpServer()).get(`/orders/my`).set('Authorization', `Bearer ${jwtUser}`)
     expect(res.status).toBe(200)
-    const userOrders = await orm.em.findAll(Order, { where: { customer: user }, orderBy: { id: 'DESC' } })
+    const userOrders = (await orm.em.findAll(Order, { where: { customer: user }, orderBy: { id: 'DESC' } })).map((order) => order.toJSON())
     expect(userOrders.length).toBe(2)
-    expect(res.body.orders).toEqual(userOrders.map((order) => order.toJSON()))
+    expect(res.body.orders).toEqual([
+      {
+        address: {
+          address: userOrders[0].address!.address,
+          city: userOrders[0].address!.city,
+          createdAt: expect.anything(),
+          id: userOrders[0].address!.id,
+          updatedAt: expect.anything()
+        },
+        comment: userOrders[0].comment,
+        createdAt: expect.anything(),
+        id: userOrders[0].id,
+        items: [
+          {
+            amount: userOrders[0].items[0].amount,
+            offeredPrice: userOrders[0].items[0].offeredPrice,
+            product: {
+              calories: userOrders[0].items[0].product.calories,
+              carbohydrates: userOrders[0].items[0].product.carbohydrates,
+              createdAt: expect.anything(),
+              description: userOrders[0].items[0].product.description,
+              fats: userOrders[0].items[0].product.fats,
+              flags: userOrders[0].items[0].product.flags,
+              id: userOrders[0].items[0].product.id,
+              images: [
+                {
+                  createdAt: expect.anything(),
+                  id: userOrders[0].items[0].product.images[0].id,
+                  type: userOrders[0].items[0].product.images[0].type,
+                  updatedAt: expect.anything(),
+                  url: userOrders[0].items[0].product.images[0].url
+                }
+              ],
+              name: userOrders[0].items[0].product.name,
+              price: userOrders[0].items[0].product.price,
+              squirrels: userOrders[0].items[0].product.squirrels,
+              updatedAt: expect.anything()
+            }
+          }
+        ],
+        paymentType: userOrders[0].paymentType,
+        total: userOrders[0].total,
+        updatedAt: expect.anything()
+      },
+      userOrders[1]
+    ])
     expect(res.body.count).toBe(2)
   })
 
@@ -136,8 +223,50 @@ describe('Order', () => {
   it('GET /orders/:orderId => should get user order by id', async () => {
     const res = await request(app.getHttpServer()).get(`/orders/1`).set('Authorization', `Bearer ${jwtUser}`)
     expect(res.status).toBe(200)
-    const userOrder = await orm.em.findOneOrFail(Order, { id: 1, customer: user })
-    expect(res.body).toEqual(userOrder.toJSON())
+    const userOrder = (await orm.em.findOneOrFail(Order, { id: 1, customer: user })).toJSON()
+    expect(res.body).toEqual({
+      address: {
+        address: userOrder.address!.address,
+        city: userOrder.address!.city,
+        createdAt: expect.anything(),
+        id: userOrder.address!.id,
+        updatedAt: expect.anything()
+      },
+      comment: userOrder.comment,
+      createdAt: expect.anything(),
+      id: userOrder.id,
+      items: [
+        {
+          amount: userOrder.items[0].amount,
+          offeredPrice: userOrder.items[0].offeredPrice,
+          product: {
+            calories: userOrder.items[0].product.calories,
+            carbohydrates: userOrder.items[0].product.carbohydrates,
+            createdAt: expect.anything(),
+            description: userOrder.items[0].product.description,
+            fats: userOrder.items[0].product.fats,
+            flags: userOrder.items[0].product.flags,
+            id: userOrder.items[0].product.id,
+            images: [
+              {
+                createdAt: expect.anything(),
+                id: userOrder.items[0].product.images[0].id,
+                type: userOrder.items[0].product.images[0].type,
+                updatedAt: expect.anything(),
+                url: userOrder.items[0].product.images[0].url
+              }
+            ],
+            name: userOrder.items[0].product.name,
+            price: userOrder.items[0].product.price,
+            squirrels: userOrder.items[0].product.squirrels,
+            updatedAt: expect.anything()
+          }
+        }
+      ],
+      paymentType: userOrder.paymentType,
+      total: userOrder.total,
+      updatedAt: expect.anything()
+    })
   })
 
   it("GET /orders/:orderId => shouldn't get order by id", async () => {
@@ -185,14 +314,14 @@ describe('Order', () => {
     })
   })
 
-  it("DELETE /orders/:orderId/:productId => should delete product by admin", async () => {
+  it('DELETE /orders/:orderId/:productId => should delete product by admin', async () => {
     const orderId = 1
     const productId = 1
     const res = await request(app.getHttpServer()).delete(`/orders/${orderId}/${productId}`).set('Authorization', `Bearer ${jwtAdmin}`)
     expect(res.status).toBe(200)
   })
 
-  it("DELETE /orders/:orderId/:productId => shouldn\'t delete product by user", async () => {
+  it("DELETE /orders/:orderId/:productId => shouldn't delete product by user", async () => {
     const orderId = 1
     const productId = 1
     const res = await request(app.getHttpServer()).delete(`/orders/${orderId}/${productId}`).set('Authorization', `Bearer ${jwtUser}`)
@@ -204,7 +333,7 @@ describe('Order', () => {
     })
   })
 
-  it("DELETE /orders/:orderId => should delete order by admin", async () => {
+  it('DELETE /orders/:orderId => should delete order by admin', async () => {
     const orderId = 1
     const addressCount = await orm.em.count(Address)
     const userCount = await orm.em.count(User)
@@ -215,7 +344,7 @@ describe('Order', () => {
     expect(await orm.em.count(User)).toBe(userCount)
   })
 
-  it("DELETE /orders/:orderId => shouldn\'t delete order by user", async () => {
+  it("DELETE /orders/:orderId => shouldn't delete order by user", async () => {
     const orderId = 2
     const res = await request(app.getHttpServer()).delete(`/orders/${orderId}`).set('Authorization', `Bearer ${jwtUser}`)
     expect(res.status).toBe(403)
@@ -226,7 +355,7 @@ describe('Order', () => {
     })
   })
 
-  it("PATCH /orders/confirm/:orderId => should update order status by admin", async () => {
+  it('PATCH /orders/confirm/:orderId => should update order status by admin', async () => {
     const orderId = 3
     const notConfirmed = await orm.em.count(Order, { id: orderId, status: OrderStatus.New })
     expect(notConfirmed).toBe(1)
@@ -236,7 +365,7 @@ describe('Order', () => {
     expect(confirmed).toBe(1)
   })
 
-  it("PATCH /orders/confirm/:orderId => shouldn\'t update order status by user", async () => {
+  it("PATCH /orders/confirm/:orderId => shouldn't update order status by user", async () => {
     const orderId = 3
     const res = await request(app.getHttpServer()).patch(`/orders/confirm/${orderId}`).set('Authorization', `Bearer ${jwtUser}`)
     expect(res.status).toBe(403)

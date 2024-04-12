@@ -16,7 +16,7 @@ export class DatabaseSeeder extends Seeder {
     const roleUser = new Role(RoleEnum.User)
     const roleAdmin = new Role(RoleEnum.Admin)
 
-    em.persist(roleAdmin).persist(roleUser)
+    em.persist([roleAdmin, roleUser])
 
     const user = new UserFactory(em)
       .each((user) => {
@@ -37,18 +37,23 @@ export class DatabaseSeeder extends Seeder {
       })
       .make(5)
 
-    new OrderFactory(em)
+    em.persist(category)  
+
+    const order = new OrderFactory(em)
       .each(async (order) => {
         order.customer = user
         order.address = await new AddressFactory(em).createOne()
 
         for (let i = 0; i < 3; i++) {
           const productIdx = faker.number.int({ max: category[i].products.length - 1 })
-          order.items.add(new OrderItem({ product: category[i].products[productIdx], amount: i, order, offeredPrice: category[i].products[productIdx].price }))
+          order.items.add(
+            new OrderItem({ product: category[i].products[productIdx], amount: i + 1, order, offeredPrice: category[i].products[productIdx].price })
+          )
         }
       })
       .make(3)
 
+    em.persist(order)
     await em.flush()
   }
 }

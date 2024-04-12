@@ -52,16 +52,17 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"user\":{\"email\":\"admin2@gmail.com\", \"password\":\"password13245678\", \"name\":\"admin\", \"phone\": \"+79991234566\"}}"
+							"raw": "{\"email\":\"admin2@gmail.com\", \"password\":\"password13245678\", \"name\":\"admin\", \"phone\": \"+79991234566\"}"
 						},
 						"url": {
-							"raw": "{{APIURL}}/api/users",
+							"raw": "{{APIURL}}/api/auth/sign-in",
 							"host": [
 								"{{APIURL}}"
 							],
 							"path": [
 								"api",
-								"users"
+								"auth",
+								"sign-in"
 							]
 						}
 					},
@@ -75,7 +76,7 @@
 							"script": {
 								"exec": [
 									"const respone = pm.response.json();",
-									"pm.environment.set(\"token\", respone.user.token)",
+									"pm.environment.set(\"token\", respone.token)",
 									"",
 									"var responseJSON = JSON.parse(responseBody);",
 									"",
@@ -107,17 +108,17 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"user\":{\"email\":\"admin2@gmail.com\", \"password\":\"password13245678\"}}"
+							"raw": "{\"email\":\"dev@dev.io\", \"password\":\"changeme\"}"
 						},
 						"url": {
-							"raw": "{{APIURL}}/api/users/login",
+							"raw": "{{APIURL}}/api/auth/sign-in",
 							"host": [
 								"{{APIURL}}"
 							],
 							"path": [
 								"api",
-								"users",
-								"login"
+								"auth",
+								"sign-in"
 							]
 						}
 					},
@@ -218,7 +219,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Token {{token}}"
+								"value": "Bearer {{token}}"
 							}
 						],
 						"url": {
@@ -228,62 +229,6 @@
 							],
 							"path": [
 								"api",
-								"user"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update User",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"var responseJSON = JSON.parse(responseBody);",
-									"",
-									"tests['Response contains \"user\" property'] = responseJSON.hasOwnProperty('user');",
-									"",
-									"var user = responseJSON.user || {};",
-									"",
-									"tests['User has \"email\" property'] = user.hasOwnProperty('email');",
-									"tests['User has \"username\" property'] = user.hasOwnProperty('username');",
-									"tests['User has \"bio\" property'] = user.hasOwnProperty('bio');",
-									"tests['User has \"image\" property'] = user.hasOwnProperty('image');",
-									"tests['User has \"token\" property'] = user.hasOwnProperty('token');",
-									""
-								]
-							}
-						}
-					],
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "X-Requested-With",
-								"value": "XMLHttpRequest"
-							},
-							{
-								"key": "Authorization",
-								"value": "Token {{token}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\"user\":{\"email\":\"{{EMAIL}}\"}}"
-						},
-						"url": {
-							"raw": "{{APIURL}}/user",
-							"host": [
-								"{{APIURL}}"
-							],
-							"path": [
 								"user"
 							]
 						}
@@ -464,7 +409,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"phone\": \"+79910000041\",\n    \"name\": \"John Doe\",\n    \"comment\": \"some comment\",\n    \"paymentType\": \"cash\",\n    \"address\": {\n        \"city\": \"city 172\",\n        \"address\": \"Black mesa\"\n    },\n    \"items\": [\n        {\n            \"productId\": 1,\n            \"amount\": 2\n        }\n    ]\n}",
+							"raw": "{\n    \"phone\": \"+79910000042\",\n    \"name\": \"John Doe\",\n    \"comment\": \"some comment\",\n    \"paymentType\": \"online\",\n    \"address\": {\n        \"city\": \"city 172\",\n        \"address\": \"Black mesa\"\n    },\n    \"items\": [\n        {\n            \"productId\": 455,\n            \"amount\": 1.4\n        }\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -479,6 +424,36 @@
 							"path": [
 								"api",
 								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all orders by admin",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{APIURL}}/api/orders?",
+							"host": [
+								"{{APIURL}}"
+							],
+							"path": [
+								"api",
+								"orders"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": null
+								}
 							]
 						}
 					},

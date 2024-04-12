@@ -13,9 +13,14 @@ export class AdminSeeder extends Seeder {
     let userRole = await em.findOne(Role, { role: RoleEnum.User })
     userRole ??= new Role(RoleEnum.User)
 
-    const user = new User(config.admin)
-    user.roles.set([userRole, adminRole])
+    const user = new User({ 
+      name: 'admin',
+      phone: config.admin.phone,
+      email: config.admin.email,
+      password: config.admin.password
+    })
 
+    user.roles.set([userRole, adminRole])
     await em.persistAndFlush(user)
   }
 }

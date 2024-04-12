@@ -2,9 +2,9 @@ import request from 'supertest'
 import { MikroORM } from '@mikro-orm/core'
 import { Test } from '@nestjs/testing'
 import { INestApplication } from '@nestjs/common'
-import mikroConfig from '../../../mikro-orm.config'
-import { AppModule } from '../../../app.module'
-import { ProductSeeder } from '../../../seeder/product.seeder'
+import mikroConfig from '../../mikro-orm.config'
+import { AppModule } from '../../app.module'
+import { ProductSeeder } from '../../seeder/product.seeder'
 import { Product } from '../product.entity'
 
 describe('Product', () => {
