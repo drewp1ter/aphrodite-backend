@@ -3,13 +3,13 @@ import { Seeder } from '@mikro-orm/seeder'
 import { faker } from '@faker-js/faker'
 import { UserFactory } from '../../src/user/user.factory'
 import { AddressFactory } from '../address/address.factory'
-import { ProductFactory } from '../category/product/product.factory'
+import { ProductFactory } from '../product/product.factory'
 import { CategoryFactory } from '../category/category.factory'
 import { OrderFactory } from '../order/order.factory'
-import { ProductImageFactory } from '../category/product/product-image/product-image.factory'
-import { Role } from '../auth/role/role.entity'
-import { RoleEnum } from '../auth/role/role.enum'
-import { OrderItem } from '../order/order-item.entity'
+import { ProductImageFactory } from '../product-image/product-image.factory'
+import { Role } from '../role/role.entity'
+import { RoleEnum } from '../role/role.enum'
+import { OrderItem } from '../order-item/order-item.entity'
 
 export class DatabaseSeeder extends Seeder {
   async run(em: EntityManager): Promise<void> {

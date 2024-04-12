@@ -1,6 +1,6 @@
 import { Entity, Property, ManyToOne, Check, PrimaryKeyProp, EntityDTO, types, wrap } from '@mikro-orm/core'
-import { Product } from '../category/product/product.entity'
-import { Order } from './order.entity'
+import { Product } from '../product/product.entity'
+import { Order } from '../order/order.entity'
 
 @Entity()
 export class OrderItem {

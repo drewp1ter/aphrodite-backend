@@ -3,7 +3,7 @@ import { EntityManager } from '@mikro-orm/core'
 import { InjectRepository } from '@mikro-orm/nestjs'
 import { Product } from './product.entity'
 import { ProductRepository } from './product.repository'
-import { config } from '../../config'
+import { config } from '../config'
 
 @Injectable()
 export class ProductService {

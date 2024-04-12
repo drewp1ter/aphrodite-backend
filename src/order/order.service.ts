@@ -7,13 +7,14 @@ import { AddressRepository } from '../address/address.repository'
 import { User } from '../user/user.entity'
 import { Order } from './order.entity'
 import { CreateOrderDto } from './dto/create-order.dto'
-import { OrderItem } from './order-item.entity'
+import { OrderItem } from '../order-item/order-item.entity'
 import { UserAddress } from '../user/user-address.entity'
 import { OrderRepository } from './order.repository'
 import { OrderStatus } from './order.entity'
 import { config } from '../config'
-import { Product } from '../category/product/product.entity'
-import { ProductRepository } from '../category/product/product.repository'
+import { Product } from '../product/product.entity'
+import { ProductRepository } from '../product/product.repository'
+
 @Injectable()
 export class OrderService {
   constructor(

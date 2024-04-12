@@ -1,8 +1,8 @@
 import { EntityManager } from '@mikro-orm/core'
 import { Seeder } from '@mikro-orm/seeder'
-import { ProductFactory } from '../category/product/product.factory'
+import { ProductFactory } from '../product/product.factory'
 import { CategoryFactory } from '../category/category.factory'
-import { ProductImageFactory } from '../category/product/product-image/product-image.factory'
+import { ProductImageFactory } from '../product-image/product-image.factory'
 
 export class ProductSeeder extends Seeder {
   async run(em: EntityManager): Promise<void> {

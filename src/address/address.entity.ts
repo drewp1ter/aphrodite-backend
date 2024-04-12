@@ -1,6 +1,5 @@
-import { Entity, EntityRepositoryType, Property, ManyToMany, Collection, EntityDTO, wrap, types } from '@mikro-orm/core'
+import { Entity, EntityRepositoryType, Property, EntityDTO, wrap, types } from '@mikro-orm/core'
 import { BaseEntity } from '../shared/entities/base.entity'
-import { User } from '../user/user.entity'
 import { AddressRepository } from './address.repository'
 
 @Entity({ repository: () => AddressRepository })

@@ -1,9 +1,8 @@
-import { Entity, EntityRepositoryType, Property, ManyToOne, EntityDTO, ManyToMany, Collection, wrap, Index, types, Check, OneToMany, raw, sql } from '@mikro-orm/core'
-import { BaseEntity } from '../../shared/entities/base.entity'
-import { Category } from '../category.entity'
-import { Order } from '../../order/order.entity'
+import { Entity, EntityRepositoryType, Property, ManyToOne, EntityDTO, Collection, wrap, Index, types, Check, OneToMany } from '@mikro-orm/core'
+import { BaseEntity } from '../shared/entities/base.entity'
+import { Category } from '../category/category.entity'
 import { ProductRepository } from './product.repository'
-import { ProductImage } from './product-image/product-image.entity'
+import { ProductImage } from '../product-image/product-image.entity'
 
 @Entity({ repository: () => ProductRepository })
 export class Product extends BaseEntity {

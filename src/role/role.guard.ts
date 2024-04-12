@@ -2,7 +2,7 @@ import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from
 import { Reflector } from '@nestjs/core'
 import { JwtService } from '@nestjs/jwt'
 import { Request } from 'express'
-import { config } from '../../config'
+import { config } from '../config'
 import { ROLES_KEY } from './roles.decorator'
 import { RoleEnum } from './role.enum'
 

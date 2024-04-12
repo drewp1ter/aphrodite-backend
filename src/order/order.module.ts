@@ -6,8 +6,8 @@ import { MikroOrmModule } from '@mikro-orm/nestjs'
 import { Address } from '../address/address.entity'
 import { User } from '../user/user.entity'
 import { Order } from './order.entity'
-import { OrderItem } from './order-item.entity'
-import { Product } from '../category/product/product.entity'
+import { OrderItem } from '../order-item/order-item.entity'
+import { Product } from '../product/product.entity'
 
 @Module({
   controllers: [OrderController],

@@ -4,9 +4,8 @@ import { UpdateUserDto } from './dto'
 import { User } from './user.decorator'
 import { IUserData } from './user.interface'
 import { UserService } from './user.service'
-
 import { ApiBearerAuth } from '@nestjs/swagger'
-import { Roles } from '../auth/role/roles.decorator'
+import { Roles } from '../role/roles.decorator'
 
 @ApiBearerAuth()
 @Roles('user')

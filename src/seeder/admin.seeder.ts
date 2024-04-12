@@ -1,8 +1,8 @@
 import { EntityManager } from '@mikro-orm/core'
 import { Seeder } from '@mikro-orm/seeder'
 import { User } from '../user/user.entity'
-import { Role } from '../auth/role/role.entity'
-import { RoleEnum } from '../auth/role/role.enum'
+import { Role } from '../role/role.entity'
+import { RoleEnum } from '../role/role.enum'
 import { config } from '../config'
 
 export class AdminSeeder extends Seeder {

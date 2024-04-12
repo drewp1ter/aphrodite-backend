@@ -2,8 +2,8 @@ import { EntityManager } from '@mikro-orm/core'
 import { Seeder } from '@mikro-orm/seeder'
 import { UserFactory } from '../../src/user/user.factory'
 import { AddressFactory } from '../address/address.factory'
-import { Role } from '../auth/role/role.entity'
-import { RoleEnum } from '../auth/role/role.enum'
+import { Role } from '../role/role.entity'
+import { RoleEnum } from '../role/role.enum'
 
 export class AddressSeeder extends Seeder {
   async run(em: EntityManager): Promise<void> {

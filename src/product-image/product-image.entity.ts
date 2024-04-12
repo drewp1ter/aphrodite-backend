@@ -1,6 +1,6 @@
 import { Entity, Property, ManyToOne, EntityDTO, wrap } from '@mikro-orm/core'
-import { BaseEntity } from '../../../shared/entities/base.entity'
-import { Product } from '../product.entity'
+import { BaseEntity } from '../shared/entities/base.entity'
+import { Product } from '../product/product.entity'
 
 @Entity()
 export class ProductImage extends BaseEntity {

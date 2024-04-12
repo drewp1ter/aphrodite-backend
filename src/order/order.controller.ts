@@ -3,9 +3,9 @@ import { ForeignKeyConstraintViolationException, CheckConstraintViolationExcepti
 import { ValidationPipe } from '../shared/pipes/validation.pipe'
 import { OrderService } from './order.service'
 import { CreateOrderDto } from './dto/create-order.dto'
-import { Roles } from '../auth/role/roles.decorator'
+import { Roles } from '../role/roles.decorator'
 import { User } from '../user/user.decorator'
-import { OrderItemDto } from './dto/order-item.dto'
+import { OrderItemDto } from '../order-item/dto/order-item.dto'
 
 @Controller('orders')
 export class OrderController {

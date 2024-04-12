@@ -4,7 +4,7 @@ import { BaseEntity } from '../shared/entities/base.entity'
 import { Address } from '../address/address.entity'
 import { UserRepository } from './user.repository'
 import { UserAddress } from './user-address.entity'
-import { Role } from '../auth/role/role.entity'
+import { Role } from '../role/role.entity'
 
 @Entity({ repository: () => UserRepository })
 export class User extends BaseEntity {

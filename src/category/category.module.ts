@@ -3,7 +3,7 @@ import { CategoryController } from './category.controller'
 import { CategoryService } from './category.service'
 import { MikroOrmModule } from '@mikro-orm/nestjs'
 import { Category } from './category.entity'
-import { ProductModule } from './product/product.module'
+import { ProductModule } from '../product/product.module'
 
 @Module({
   controllers: [CategoryController],

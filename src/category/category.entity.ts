@@ -1,6 +1,6 @@
 import { Entity, Property, OneToMany, EntityDTO, wrap, Collection, Index, EntityRepositoryType } from '@mikro-orm/core'
 import { BaseEntity } from '../shared/entities/base.entity'
-import { Product } from './product/product.entity'
+import { Product } from '../product/product.entity'
 import { CategoryRepository } from './category.repository'
 
 @Entity({ repository: () => CategoryRepository })

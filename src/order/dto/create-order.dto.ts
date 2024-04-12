@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsPhoneNumber, MaxLength, IsArray, IsOptional, IsEnum } from 'class-validator'
 import { CreateAddressDto } from '../../address/dto/create-address.dto'
-import { OrderItemDto } from './order-item.dto'
+import { OrderItemDto } from '../../order-item/dto/order-item.dto'
 import { OrderPaymentType } from '../order.entity'
 
 export class CreateOrderDto {
