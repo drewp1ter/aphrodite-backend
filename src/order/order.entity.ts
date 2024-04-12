@@ -50,7 +50,7 @@ export class Order extends BaseEntity {
   confirmationToken!: string
 
   @Property({ persist: false })
-  get total() {
+  get total(): string {
     const result = this.items.reduce((prev, item) => prev + (item.offeredPrice * item.amount) , 0)
     return result.toFixed(0)
   }
