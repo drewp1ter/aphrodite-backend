@@ -208,8 +208,8 @@
           "default": "''",
           "mappedType": "string"
         },
-        "squirrels": {
-          "name": "squirrels",
+        "proteins": {
+          "name": "proteins",
           "type": "int",
           "unsigned": false,
           "autoincrement": false,

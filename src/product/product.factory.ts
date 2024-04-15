@@ -10,7 +10,7 @@ export class ProductFactory extends Factory<Product> {
       name: faker.commerce.productName(),
       description: faker.commerce.productDescription(),
       price: parseFloat(faker.commerce.price({ min: 10, max: 2000 })),
-      squirrels: faker.number.int({ max: 1000 }),
+      proteins: faker.number.int({ max: 1000 }),
       fats: faker.number.int({ max: 1000 }),
       carbohydrates: faker.number.int({ max: 1000 }),
       flags: faker.number.int({ max: 7 }),

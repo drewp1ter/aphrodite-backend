@@ -99,7 +99,7 @@ describe('Order', () => {
             ],
             name: createdOrder.items[0].product.name,
             price: createdOrder.items[0].product.price,
-            squirrels: createdOrder.items[0].product.squirrels,
+            proteins: createdOrder.items[0].product.proteins,
             createdAt: expect.anything(),
             updatedAt: expect.anything()
           }
@@ -197,7 +197,7 @@ describe('Order', () => {
               ],
               name: userOrders[0].items[0].product.name,
               price: userOrders[0].items[0].product.price,
-              squirrels: userOrders[0].items[0].product.squirrels,
+              proteins: userOrders[0].items[0].product.proteins,
               updatedAt: expect.anything()
             }
           }
@@ -258,7 +258,7 @@ describe('Order', () => {
             ],
             name: userOrder.items[0].product.name,
             price: userOrder.items[0].product.price,
-            squirrels: userOrder.items[0].product.squirrels,
+            proteins: userOrder.items[0].product.proteins,
             updatedAt: expect.anything()
           }
         }

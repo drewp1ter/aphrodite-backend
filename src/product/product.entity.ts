@@ -9,12 +9,12 @@ export class Product extends BaseEntity {
   [EntityRepositoryType]?: ProductRepository
 
   constructor(
-    partial: PartialBy<Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'orders'>, 'calories' | 'carbohydrates' | 'flags' | 'fats' | 'squirrels'>
+    partial: PartialBy<Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'orders'>, 'calories' | 'carbohydrates' | 'flags' | 'fats' | 'proteins'>
   ) {
     super()
     this.name = partial.name
     this.description = partial.description
-    this.squirrels = partial.squirrels ?? 0
+    this.proteins = partial.proteins ?? 0
     this.fats = partial.fats ?? 0
     this.carbohydrates = partial.carbohydrates ?? 0
     this.flags = partial.flags ?? ProductFlags.none
@@ -36,7 +36,7 @@ export class Product extends BaseEntity {
   description: string
 
   @Property({ default: 0 })
-  squirrels: number
+  proteins: number
 
   @Property({ default: 0 })
   fats: number
