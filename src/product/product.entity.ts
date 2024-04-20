@@ -1,3 +1,4 @@
+import { v4 } from 'uuid'
 import { Entity, EntityRepositoryType, Property, ManyToOne, EntityDTO, Collection, wrap, Index, types, Check, OneToMany } from '@mikro-orm/core'
 import { BaseEntity } from '../shared/entities/base.entity'
 import { Category } from '../category/category.entity'
@@ -12,6 +13,7 @@ export class Product extends BaseEntity {
     partial: PartialBy<Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'orders'>, 'calories' | 'carbohydrates' | 'flags' | 'fats' | 'proteins'>
   ) {
     super()
+    this.iikoId = partial.iikoId ?? v4()
     this.name = partial.name
     this.description = partial.description
     this.proteins = partial.proteins ?? 0
@@ -21,6 +23,9 @@ export class Product extends BaseEntity {
     this.calories = partial.calories ?? 0
     this.price = partial.price
   }
+
+  @Property({ type: 'uuid', index: true, hidden: true, lazy: true })
+  iikoId!: string
 
   @ManyToOne({ hidden: true, lazy: true })
   category!: Category

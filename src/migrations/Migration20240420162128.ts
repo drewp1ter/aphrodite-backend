@@ -1,14 +1,19 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20240411194022 extends Migration {
+export class Migration20240420162128 extends Migration {
 
   async up(): Promise<void> {
     this.addSql('create table `address` (`id` int unsigned not null auto_increment primary key, `created_at` datetime not null, `updated_at` datetime not null, `city` varchar(255) not null, `address` text not null) default character set utf8mb4 engine = InnoDB;');
 
-    this.addSql('create table `category` (`id` int unsigned not null auto_increment primary key, `created_at` datetime not null, `updated_at` datetime not null, `name` varchar(255) not null, `description` varchar(8192) not null default \'\') default character set utf8mb4 engine = InnoDB;');
+    this.addSql('create table `category` (`id` int unsigned not null auto_increment primary key, `created_at` datetime not null, `updated_at` datetime not null, `iiko_id` varchar(36) not null, `name` varchar(255) not null, `description` varchar(8192) not null default \'\') default character set utf8mb4 engine = InnoDB;');
+    this.addSql('alter table `category` add index `category_iiko_id_index`(`iiko_id`);');
     this.addSql('alter table `category` add fulltext index `category_name_index`(`name`);');
 
-    this.addSql('create table `product` (`id` int unsigned not null auto_increment primary key, `created_at` datetime not null, `updated_at` datetime not null, `category_id` int unsigned not null, `name` varchar(255) not null, `description` varchar(8192) not null default \'\', `proteins` int not null default 0, `fats` int not null default 0, `carbohydrates` int not null default 0, `flags` varchar(255) not null default 0, `calories` int not null default 0, `price` float not null, constraint product_price_check check (price >= 0)) default character set utf8mb4 engine = InnoDB;');
+    this.addSql('create table `category_image` (`id` int unsigned not null auto_increment primary key, `created_at` datetime not null, `updated_at` datetime not null, `category_id` int unsigned not null, `url` text not null, `type` varchar(255) not null default \'\') default character set utf8mb4 engine = InnoDB;');
+    this.addSql('alter table `category_image` add index `category_image_category_id_index`(`category_id`);');
+
+    this.addSql('create table `product` (`id` int unsigned not null auto_increment primary key, `created_at` datetime not null, `updated_at` datetime not null, `iiko_id` varchar(36) not null, `category_id` int unsigned not null, `name` varchar(255) not null, `description` varchar(8192) not null default \'\', `proteins` int not null default 0, `fats` int not null default 0, `carbohydrates` int not null default 0, `flags` varchar(255) not null default 0, `calories` int not null default 0, `price` float not null, constraint product_price_check check (price >= 0)) default character set utf8mb4 engine = InnoDB;');
+    this.addSql('alter table `product` add index `product_iiko_id_index`(`iiko_id`);');
     this.addSql('alter table `product` add index `product_category_id_index`(`category_id`);');
     this.addSql('alter table `product` add fulltext index `product_name_index`(`name`);');
 
@@ -38,6 +43,8 @@ export class Migration20240411194022 extends Migration {
     this.addSql('create table `user_address` (`user_id` int unsigned not null, `address_id` int unsigned not null, primary key (`user_id`, `address_id`)) default character set utf8mb4 engine = InnoDB;');
     this.addSql('alter table `user_address` add index `user_address_user_id_index`(`user_id`);');
     this.addSql('alter table `user_address` add index `user_address_address_id_index`(`address_id`);');
+
+    this.addSql('alter table `category_image` add constraint `category_image_category_id_foreign` foreign key (`category_id`) references `category` (`id`) on update cascade;');
 
     this.addSql('alter table `product` add constraint `product_category_id_foreign` foreign key (`category_id`) references `category` (`id`) on update cascade;');
 
