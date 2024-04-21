@@ -6,6 +6,7 @@ import { INomenclature } from './iiko.interface'
 import * as api from './iiko.api'
 import { CategoryImage } from '../category-image/category-image.entity'
 import { ProductImage } from '../product-image/product-image.entity'
+import { config } from '../config'
 
 @Injectable()
 export class IikoService {
@@ -31,10 +32,10 @@ export class IikoService {
       if (!nomenclature) return
 
       const actualCategories = nomenclature.groups
-        .filter((group) => group.name.startsWith('#'))
+        .filter((group) => group.name.startsWith(config.iiko.categoryMarker))
         .map((category) => {
           return new Category({
-            name: category.name.slice(1),
+            name: category.name.slice(config.iiko.categoryMarker.length),
             description: category.description ?? '',
             order: category.order,
             isDeleted: category.isDeleted,
