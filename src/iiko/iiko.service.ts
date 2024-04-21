@@ -23,21 +23,21 @@ export class IikoService {
   ) {}
 
   async syncProducts() {
-    this.iikoToken ??= await api.accessToken('test')
+    this.iikoToken ??= await api.accessToken()
     let nomenclature: INomenclature | null = null
     for (let i = 3; i--; ) {
       try {
         nomenclature = await api.nomenclature(this.iikoToken)
         break
       } catch (e) {
-        this.iikoToken = await api.accessToken('test')
+        this.iikoToken = await api.accessToken()
       }
     }
 
     return this.em.transactional(async (em) => {
       if (!nomenclature) return
 
-      const actual_categories = nomenclature.groups
+      const actualCategories = nomenclature.groups
         .filter((group) => group.name.startsWith('#'))
         .map((category) => {
           return new Category({
@@ -49,7 +49,7 @@ export class IikoService {
           })
         })
 
-      const updatedCategories = await this.categoryRepository.upsertMany(actual_categories, { ctx: em.getContext() })
+      const updatedCategories = await this.categoryRepository.upsertMany(actualCategories, { ctx: em.getContext() })
 
       const actualProducts = nomenclature.products.reduce<Product[]>((result, product) => {
         const category = updatedCategories.find((category) => category.iikoId === product.parentGroup)
