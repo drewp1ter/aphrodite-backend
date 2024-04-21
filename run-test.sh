@@ -17,6 +17,9 @@ docker run --rm -d \
   --user $UID:$GID \
   mysql:8.3
 
+echo "Building application..."
+npx nest build
+
 while true; do
     echo "Waiting for the database to start..."
     if [ -d "${MYSQL_DATA_DIR}/${DB_NAME}" ]; then
@@ -24,9 +27,7 @@ while true; do
     fi
     sleep 1
 done
-
-echo "Building application..."
-npx nest build
+sleep 1
 npx mikro-orm migration:up --config ./dist/mikro-orm.config.js
 npx jest --watch --config=jest.json -w1
 docker stop ${CONTAINER_NAME}

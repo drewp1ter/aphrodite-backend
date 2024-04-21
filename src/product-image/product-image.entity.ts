@@ -7,7 +7,7 @@ export class ProductImage extends BaseEntity {
   @ManyToOne({ hidden: true })
   product!: Product
 
-  @Property({ type: 'text' })
+  @Property({ length: 512, unique: true })
   url!: string
 
   @Property({ default: '' })

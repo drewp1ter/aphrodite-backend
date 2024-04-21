@@ -1,12 +1,12 @@
-import { PrimaryKey, Property } from '@mikro-orm/core'
+import { PrimaryKey, Property, sql } from '@mikro-orm/core'
 
 export abstract class BaseEntity {
   @PrimaryKey()
   id!: number
 
-  @Property({ serializer: value => value.toISOString() })
-  createdAt = new Date()
+  @Property({ default: sql.now(), serializer: value => value.toISOString() })
+  createdAt?: Date
 
-  @Property({ onUpdate: () => new Date(), serializer: value => value.toISOString() })
-  updatedAt = new Date()
+  @Property({ default: sql.now(), onUpdate: () => new Date(), serializer: value => value.toISOString() })
+  updatedAt?: Date
 }

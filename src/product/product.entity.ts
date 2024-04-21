@@ -1,31 +1,30 @@
-import { v4 } from 'uuid'
 import { Entity, EntityRepositoryType, Property, ManyToOne, EntityDTO, Collection, wrap, Index, types, Check, OneToMany } from '@mikro-orm/core'
-import { BaseEntity } from '../shared/entities/base.entity'
+import { IikoEntity } from '../shared/entities/iiko.entity'
 import { Category } from '../category/category.entity'
 import { ProductRepository } from './product.repository'
 import { ProductImage } from '../product-image/product-image.entity'
 
 @Entity({ repository: () => ProductRepository })
-export class Product extends BaseEntity {
+export class Product extends IikoEntity {
   [EntityRepositoryType]?: ProductRepository
 
   constructor(
-    partial: PartialBy<Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'orders'>, 'calories' | 'carbohydrates' | 'flags' | 'fats' | 'proteins'>
+    partial: RequiredBy<Product, 'name' | 'price' | 'category'>
   ) {
     super()
-    this.iikoId = partial.iikoId ?? v4()
+    this.iikoId = partial.iikoId
     this.name = partial.name
     this.description = partial.description
-    this.proteins = partial.proteins ?? 0
-    this.fats = partial.fats ?? 0
-    this.carbohydrates = partial.carbohydrates ?? 0
-    this.flags = partial.flags ?? ProductFlags.none
-    this.calories = partial.calories ?? 0
+    this.weight = partial.weight
+    this.measureUnit = partial.measureUnit
+    this.proteins = partial.proteins
+    this.fats = partial.fats
+    this.carbohydrates = partial.carbohydrates 
+    this.flags = partial.flags
+    this.calories = partial.calories
     this.price = partial.price
+    this.category = partial.category
   }
-
-  @Property({ type: 'uuid', index: true, hidden: true, lazy: true })
-  iikoId!: string
 
   @ManyToOne({ hidden: true, lazy: true })
   category!: Category
@@ -38,22 +37,29 @@ export class Product extends BaseEntity {
   name: string
 
   @Property({ default: '', length: 8192 })
-  description: string
+  description?: string
+
+  @Property({ length: 80, default: '' })
+  measureUnit?: string
+
+  @Property({ type: types.float, default: 0 })
+  @Check({ expression: 'weight >= 0' })
+  weight?: number
 
   @Property({ default: 0 })
-  proteins: number
+  proteins?: number
 
   @Property({ default: 0 })
-  fats: number
+  fats?: number
 
   @Property({ default: 0 })
-  carbohydrates: number
+  carbohydrates?: number
 
   @Property({ default: 0 })
-  flags: ProductFlags
+  flags?: ProductFlags
 
   @Property({ default: 0 })
-  calories: number
+  calories?: number
 
   @Property({ type: types.float })
   @Check({ expression: 'price >= 0' })

@@ -1,33 +1,35 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20240420162128 extends Migration {
+export class Migration20240421154128 extends Migration {
 
   async up(): Promise<void> {
-    this.addSql('create table `address` (`id` int unsigned not null auto_increment primary key, `created_at` datetime not null, `updated_at` datetime not null, `city` varchar(255) not null, `address` text not null) default character set utf8mb4 engine = InnoDB;');
+    this.addSql('create table `address` (`id` int unsigned not null auto_increment primary key, `created_at` datetime null default current_timestamp, `updated_at` datetime null default current_timestamp, `city` varchar(255) not null, `address` text not null) default character set utf8mb4 engine = InnoDB;');
 
-    this.addSql('create table `category` (`id` int unsigned not null auto_increment primary key, `created_at` datetime not null, `updated_at` datetime not null, `iiko_id` varchar(36) not null, `name` varchar(255) not null, `description` varchar(8192) not null default \'\') default character set utf8mb4 engine = InnoDB;');
-    this.addSql('alter table `category` add index `category_iiko_id_index`(`iiko_id`);');
+    this.addSql('create table `category` (`id` int unsigned not null auto_increment primary key, `created_at` datetime null default current_timestamp, `updated_at` datetime null default current_timestamp, `iiko_id` varchar(36) null, `order` int null, `is_deleted` tinyint(1) null default false, `name` varchar(255) not null, `description` varchar(8192) not null default \'\') default character set utf8mb4 engine = InnoDB;');
+    this.addSql('alter table `category` add unique `category_iiko_id_unique`(`iiko_id`);');
     this.addSql('alter table `category` add fulltext index `category_name_index`(`name`);');
 
-    this.addSql('create table `category_image` (`id` int unsigned not null auto_increment primary key, `created_at` datetime not null, `updated_at` datetime not null, `category_id` int unsigned not null, `url` text not null, `type` varchar(255) not null default \'\') default character set utf8mb4 engine = InnoDB;');
+    this.addSql('create table `category_image` (`id` int unsigned not null auto_increment primary key, `created_at` datetime null default current_timestamp, `updated_at` datetime null default current_timestamp, `category_id` int unsigned not null, `url` varchar(512) not null, `type` varchar(255) not null default \'\') default character set utf8mb4 engine = InnoDB;');
     this.addSql('alter table `category_image` add index `category_image_category_id_index`(`category_id`);');
+    this.addSql('alter table `category_image` add unique `category_image_url_unique`(`url`);');
 
-    this.addSql('create table `product` (`id` int unsigned not null auto_increment primary key, `created_at` datetime not null, `updated_at` datetime not null, `iiko_id` varchar(36) not null, `category_id` int unsigned not null, `name` varchar(255) not null, `description` varchar(8192) not null default \'\', `proteins` int not null default 0, `fats` int not null default 0, `carbohydrates` int not null default 0, `flags` varchar(255) not null default 0, `calories` int not null default 0, `price` float not null, constraint product_price_check check (price >= 0)) default character set utf8mb4 engine = InnoDB;');
-    this.addSql('alter table `product` add index `product_iiko_id_index`(`iiko_id`);');
+    this.addSql('create table `product` (`id` int unsigned not null auto_increment primary key, `created_at` datetime null default current_timestamp, `updated_at` datetime null default current_timestamp, `iiko_id` varchar(36) null, `order` int null, `is_deleted` tinyint(1) null default false, `category_id` int unsigned not null, `name` varchar(255) not null, `description` varchar(8192) null default \'\', `measure_unit` varchar(80) null default \'\', `weight` float null default 0, `proteins` int null default 0, `fats` int null default 0, `carbohydrates` int null default 0, `flags` varchar(255) null default 0, `calories` int null default 0, `price` float not null, constraint product_weight_check check (weight >= 0), constraint product_price_check check (price >= 0)) default character set utf8mb4 engine = InnoDB;');
+    this.addSql('alter table `product` add unique `product_iiko_id_unique`(`iiko_id`);');
     this.addSql('alter table `product` add index `product_category_id_index`(`category_id`);');
     this.addSql('alter table `product` add fulltext index `product_name_index`(`name`);');
 
-    this.addSql('create table `product_image` (`id` int unsigned not null auto_increment primary key, `created_at` datetime not null, `updated_at` datetime not null, `product_id` int unsigned not null, `url` text not null, `type` varchar(255) not null default \'\') default character set utf8mb4 engine = InnoDB;');
+    this.addSql('create table `product_image` (`id` int unsigned not null auto_increment primary key, `created_at` datetime null default current_timestamp, `updated_at` datetime null default current_timestamp, `product_id` int unsigned not null, `url` varchar(512) not null, `type` varchar(255) not null default \'\') default character set utf8mb4 engine = InnoDB;');
     this.addSql('alter table `product_image` add index `product_image_product_id_index`(`product_id`);');
+    this.addSql('alter table `product_image` add unique `product_image_url_unique`(`url`);');
 
     this.addSql('create table `role` (`id` int unsigned not null auto_increment primary key, `role` enum(\'user\', \'admin\') not null) default character set utf8mb4 engine = InnoDB;');
     this.addSql('alter table `role` add unique `role_role_unique`(`role`);');
 
-    this.addSql('create table `user` (`id` int unsigned not null auto_increment primary key, `created_at` datetime not null, `updated_at` datetime not null, `name` varchar(255) not null, `email` varchar(255) null, `phone` varchar(255) not null, `password` varchar(255) not null, `is_email_confirmed` tinyint(1) not null default false, `is_phone_confirmed` tinyint(1) not null default false) default character set utf8mb4 engine = InnoDB;');
+    this.addSql('create table `user` (`id` int unsigned not null auto_increment primary key, `created_at` datetime null default current_timestamp, `updated_at` datetime null default current_timestamp, `name` varchar(255) not null, `email` varchar(255) null, `phone` varchar(255) not null, `password` varchar(255) not null, `is_email_confirmed` tinyint(1) not null default false, `is_phone_confirmed` tinyint(1) not null default false) default character set utf8mb4 engine = InnoDB;');
     this.addSql('alter table `user` add unique `user_email_unique`(`email`);');
     this.addSql('alter table `user` add unique `user_phone_unique`(`phone`);');
 
-    this.addSql('create table `order` (`id` int unsigned not null auto_increment primary key, `created_at` datetime not null, `updated_at` datetime not null, `customer_id` int unsigned not null, `address_id` int unsigned null, `status` varchar(255) not null default \'new\', `comment` text null, `payment_type` varchar(255) not null, `confirmation_token` varchar(255) not null default \'\') default character set utf8mb4 engine = InnoDB;');
+    this.addSql('create table `order` (`id` int unsigned not null auto_increment primary key, `created_at` datetime null default current_timestamp, `updated_at` datetime null default current_timestamp, `customer_id` int unsigned not null, `address_id` int unsigned null, `status` varchar(255) not null default \'new\', `comment` text null, `payment_type` varchar(255) not null, `confirmation_token` varchar(255) not null default \'\') default character set utf8mb4 engine = InnoDB;');
     this.addSql('alter table `order` add index `order_customer_id_index`(`customer_id`);');
     this.addSql('alter table `order` add index `order_address_id_index`(`address_id`);');
     this.addSql('alter table `order` add index `order_confirmation_token_index`(`confirmation_token`);');

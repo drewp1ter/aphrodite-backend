@@ -7,7 +7,7 @@ export class CategoryImage extends BaseEntity {
   @ManyToOne({ hidden: true })
   category!: Category
 
-  @Property({ type: 'text' })
+  @Property({ length: 512, unique: true })
   url!: string
 
   @Property({ default: '' })
