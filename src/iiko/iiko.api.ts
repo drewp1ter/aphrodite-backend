@@ -1,3 +1,5 @@
+// documentation: https://api-ru.iiko.services/
+
 import { fetchAbsolute } from '../shared/helpers'
 import { INomenclature } from './iiko.interface'
 
