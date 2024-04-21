@@ -1,10 +1,7 @@
 import { Injectable } from '@nestjs/common'
-import { InjectRepository } from '@mikro-orm/nestjs'
 import { EntityManager } from '@mikro-orm/core'
 import { Category } from '../category/category.entity'
-import { CategoryRepository } from '../category/category.repository'
 import { Product } from '../product/product.entity'
-import { ProductRepository } from '../product/product.repository'
 import { INomenclature } from './iiko.interface'
 import * as api from './iiko.api'
 import { CategoryImage } from '../category-image/category-image.entity'
@@ -15,11 +12,7 @@ export class IikoService {
   iikoToken!: string
 
   constructor(
-    private readonly em: EntityManager,
-    @InjectRepository(Category)
-    private readonly categoryRepository: CategoryRepository,
-    @InjectRepository(Product)
-    private readonly productRepository: ProductRepository
+    private readonly em: EntityManager
   ) {}
 
   async syncProducts() {
@@ -49,14 +42,13 @@ export class IikoService {
           })
         })
 
-      const updatedCategories = await this.categoryRepository.upsertMany(actualCategories, { ctx: em.getContext() })
+      const updatedCategories = await em.upsertMany(Category, actualCategories)
 
       const actualProducts = nomenclature.products.reduce<Product[]>((result, product) => {
         const category = updatedCategories.find((category) => category.iikoId === product.parentGroup)
         category &&
           result.push(
             new Product({
-              iikoId: product.id,
               name: product.name,
               price: product.sizePrices[0].price.currentPrice,
               description: product.description ?? '',
@@ -68,18 +60,19 @@ export class IikoService {
               measureUnit: product.measureUnit,
               order: product.order,
               isDeleted: product.isDeleted,
+              iikoId: product.id,
               category
             })
           )
         return result
       }, [])
 
-      const updatedProducts = await this.productRepository.upsertMany(actualProducts, { ctx: em.getContext() })
+      const updatedProducts = await em.upsertMany(Product, actualProducts)
 
       const updatedCategoriesIds = updatedCategories.map((category) => category.iikoId!)
       const updatedProductsIds = updatedProducts.map((product) => product.iikoId!)
-      await this.categoryRepository.nativeUpdate({ iikoId: { $nin: updatedCategoriesIds } }, { isDeleted: true }, { ctx: em.getContext() })
-      await this.productRepository.nativeUpdate({ iikoId: { $nin: updatedProductsIds } }, { isDeleted: true }, { ctx: em.getContext() })
+      await em.nativeUpdate(Category, { iikoId: { $nin: updatedCategoriesIds } }, { isDeleted: true })
+      await em.nativeUpdate(Product, { iikoId: { $nin: updatedProductsIds } }, { isDeleted: true })
 
       const categoryImages = nomenclature.groups
         .filter((group) => group.name.startsWith('#'))
