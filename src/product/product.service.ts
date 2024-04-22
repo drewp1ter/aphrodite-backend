@@ -14,7 +14,7 @@ export class ProductService {
   ) {}
 
   async findByCategoryId(categotyId: number) {
-    return this.productRepository.findAll({ where: { category: categotyId }, populate: ['images'] })
+    return this.productRepository.findAll({ where: { category: categotyId, isDeleted: false }, orderBy: { order: 'ASC' }, populate: ['images'] })
   }
 
   async find({ query, page = 1, pageSize = config.defaultPageSize }: FindProps) {

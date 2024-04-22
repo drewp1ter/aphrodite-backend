@@ -11,6 +11,6 @@ export class CategoryService {
   ) {}
 
   async findAll() {
-    return this.categoryRepository.findAll()
+    return this.categoryRepository.findAll({ where: { isDeleted: false }, orderBy: { order: 'ASC' } })
   }
 }

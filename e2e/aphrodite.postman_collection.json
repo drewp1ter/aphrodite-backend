@@ -108,7 +108,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"email\":\"dev@dev.io\", \"password\":\"changeme\"}"
+							"raw": "{\"email\":\"dev@dev.io\", \"password\":\"dev\"}"
 						},
 						"url": {
 							"raw": "{{APIURL}}/api/auth/sign-in",
@@ -454,6 +454,45 @@
 									"key": "",
 									"value": null
 								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "iiko",
+			"item": [
+				{
+					"name": "update-products",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{APIURL}}/api/iiko/update-products",
+							"host": [
+								"{{APIURL}}"
+							],
+							"path": [
+								"api",
+								"iiko",
+								"update-products"
 							]
 						}
 					},

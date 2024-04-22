@@ -18,8 +18,9 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "length": 0,
+          "default": "current_timestamp",
           "mappedType": "datetime"
         },
         "updated_at": {
@@ -28,8 +29,9 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "length": 0,
+          "default": "current_timestamp",
           "mappedType": "datetime"
         },
         "city": {
@@ -85,8 +87,9 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "length": 0,
+          "default": "current_timestamp",
           "mappedType": "datetime"
         },
         "updated_at": {
@@ -95,9 +98,39 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "length": 0,
+          "default": "current_timestamp",
           "mappedType": "datetime"
+        },
+        "iiko_id": {
+          "name": "iiko_id",
+          "type": "varchar(36)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 36,
+          "mappedType": "string"
+        },
+        "order": {
+          "name": "order",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "integer"
+        },
+        "is_deleted": {
+          "name": "is_deleted",
+          "type": "tinyint(1)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "default": "false",
+          "mappedType": "boolean"
         },
         "name": {
           "name": "name",
@@ -122,6 +155,16 @@
       },
       "name": "category",
       "indexes": [
+        {
+          "columnNames": [
+            "iiko_id"
+          ],
+          "composite": false,
+          "keyName": "category_iiko_id_unique",
+          "constraint": true,
+          "primary": false,
+          "unique": true
+        },
         {
           "keyName": "category_name_index",
           "columnNames": [
@@ -165,8 +208,9 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "length": 0,
+          "default": "current_timestamp",
           "mappedType": "datetime"
         },
         "updated_at": {
@@ -175,9 +219,152 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "length": 0,
+          "default": "current_timestamp",
           "mappedType": "datetime"
+        },
+        "category_id": {
+          "name": "category_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "url": {
+          "name": "url",
+          "type": "varchar(512)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 512,
+          "mappedType": "string"
+        },
+        "type": {
+          "name": "type",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "''",
+          "mappedType": "string"
+        }
+      },
+      "name": "category_image",
+      "indexes": [
+        {
+          "columnNames": [
+            "category_id"
+          ],
+          "composite": false,
+          "keyName": "category_image_category_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "url"
+          ],
+          "composite": false,
+          "keyName": "category_image_url_unique",
+          "constraint": true,
+          "primary": false,
+          "unique": true
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "category_image_category_id_foreign": {
+          "constraintName": "category_image_category_id_foreign",
+          "columnNames": [
+            "category_id"
+          ],
+          "localTableName": "category_image",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "category",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 0,
+          "default": "current_timestamp",
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 0,
+          "default": "current_timestamp",
+          "mappedType": "datetime"
+        },
+        "iiko_id": {
+          "name": "iiko_id",
+          "type": "varchar(36)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 36,
+          "mappedType": "string"
+        },
+        "order": {
+          "name": "order",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "integer"
+        },
+        "is_deleted": {
+          "name": "is_deleted",
+          "type": "tinyint(1)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "default": "false",
+          "mappedType": "boolean"
         },
         "category_id": {
           "name": "category_id",
@@ -203,10 +390,31 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "length": 8192,
           "default": "''",
           "mappedType": "string"
+        },
+        "measure_unit": {
+          "name": "measure_unit",
+          "type": "varchar(80)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 80,
+          "default": "''",
+          "mappedType": "string"
+        },
+        "weight": {
+          "name": "weight",
+          "type": "float",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "default": "0",
+          "mappedType": "float"
         },
         "proteins": {
           "name": "proteins",
@@ -214,7 +422,7 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "default": "0",
           "mappedType": "integer"
         },
@@ -224,7 +432,7 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "default": "0",
           "mappedType": "integer"
         },
@@ -234,7 +442,7 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "default": "0",
           "mappedType": "integer"
         },
@@ -244,7 +452,7 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "default": "0",
           "mappedType": "string"
         },
@@ -254,7 +462,7 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "default": "0",
           "mappedType": "integer"
         },
@@ -270,6 +478,16 @@
       },
       "name": "product",
       "indexes": [
+        {
+          "columnNames": [
+            "iiko_id"
+          ],
+          "composite": false,
+          "keyName": "product_iiko_id_unique",
+          "constraint": true,
+          "primary": false,
+          "unique": true
+        },
         {
           "columnNames": [
             "category_id"
@@ -303,6 +521,12 @@
         }
       ],
       "checks": [
+        {
+          "name": "product_weight_check",
+          "expression": "weight >= 0",
+          "definition": "check ((weight >= 0))",
+          "columnName": "weight"
+        },
         {
           "name": "product_price_check",
           "expression": "price >= 0",
@@ -343,8 +567,9 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "length": 0,
+          "default": "current_timestamp",
           "mappedType": "datetime"
         },
         "updated_at": {
@@ -353,8 +578,9 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "length": 0,
+          "default": "current_timestamp",
           "mappedType": "datetime"
         },
         "product_id": {
@@ -368,12 +594,13 @@
         },
         "url": {
           "name": "url",
-          "type": "text",
+          "type": "varchar(512)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "text"
+          "length": 512,
+          "mappedType": "string"
         },
         "type": {
           "name": "type",
@@ -397,6 +624,16 @@
           "constraint": false,
           "primary": false,
           "unique": false
+        },
+        {
+          "columnNames": [
+            "url"
+          ],
+          "composite": false,
+          "keyName": "product_image_url_unique",
+          "constraint": true,
+          "primary": false,
+          "unique": true
         },
         {
           "keyName": "PRIMARY",
@@ -495,8 +732,9 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "length": 0,
+          "default": "current_timestamp",
           "mappedType": "datetime"
         },
         "updated_at": {
@@ -505,8 +743,9 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "length": 0,
+          "default": "current_timestamp",
           "mappedType": "datetime"
         },
         "name": {
@@ -620,8 +859,9 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "length": 0,
+          "default": "current_timestamp",
           "mappedType": "datetime"
         },
         "updated_at": {
@@ -630,8 +870,9 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "length": 0,
+          "default": "current_timestamp",
           "mappedType": "datetime"
         },
         "customer_id": {

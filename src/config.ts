@@ -16,6 +16,11 @@ const defaultConfig = {
     password: '',
     host: 'localhost',
     port: 3306,
+  },
+  iiko: {
+    apiLogin: '',
+    organizationId: '',
+    categoryMarker: '#'
   }
 }
 
@@ -38,6 +43,11 @@ export const config = assignDefined(defaultConfig, {
     name: env.DB_NAME,
     host: env.DB_HOST,
     port: Number(env.DB_PORT)
+  }),
+  iiko: assignDefined(defaultConfig.iiko, {
+    apiLogin: env.IIKO_API_LOGIN,
+    organizationId: env.IIKO_ORGANIZATION_ID,
+    categoryMarker: env.IIKO_CATEGORY_MARKER
   })
 })
 

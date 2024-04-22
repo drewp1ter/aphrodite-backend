@@ -100,6 +100,8 @@ describe('Order', () => {
             name: createdOrder.items[0].product.name,
             price: createdOrder.items[0].product.price,
             proteins: createdOrder.items[0].product.proteins,
+            weight: createdOrder.items[0].product.weight,
+            measureUnit: createdOrder.items[0].product.measureUnit,
             createdAt: expect.anything(),
             updatedAt: expect.anything()
           }
@@ -198,6 +200,8 @@ describe('Order', () => {
               name: userOrders[0].items[0].product.name,
               price: userOrders[0].items[0].product.price,
               proteins: userOrders[0].items[0].product.proteins,
+              weight: userOrders[0].items[0].product.weight,
+              measureUnit: userOrders[0].items[0].product.measureUnit,
               updatedAt: expect.anything()
             }
           }
@@ -259,6 +263,8 @@ describe('Order', () => {
             name: userOrder.items[0].product.name,
             price: userOrder.items[0].product.price,
             proteins: userOrder.items[0].product.proteins,
+            weight: userOrder.items[0].product.weight,
+            measureUnit: userOrder.items[0].product.measureUnit,
             updatedAt: expect.anything()
           }
         }

@@ -1,11 +1,11 @@
 import { Entity, Property, ManyToOne, EntityDTO, wrap } from '@mikro-orm/core'
 import { BaseEntity } from '../shared/entities/base.entity'
-import { Product } from '../product/product.entity'
+import { Category } from '../category/category.entity'
 
 @Entity()
-export class ProductImage extends BaseEntity {
+export class CategoryImage extends BaseEntity {
   @ManyToOne({ hidden: true })
-  product!: Product
+  category!: Category
 
   @Property({ length: 512, unique: true })
   url!: string
@@ -13,14 +13,14 @@ export class ProductImage extends BaseEntity {
   @Property({ default: '' })
   type!: string
 
-  constructor(partial: Partial<ProductImage>) {
+  constructor(partial: Partial<CategoryImage>) {
     super()
     Object.assign(this, partial)
   }
 
   toJSON() {
-    return wrap<ProductImage>(this).toObject() as ProductImageDto
+    return wrap<CategoryImage>(this).toObject() as CategoryImageDto
   }
 }
 
-export interface ProductImageDto extends EntityDTO<ProductImage> {}
+export interface CategoryImageDto extends EntityDTO<CategoryImage> {}
