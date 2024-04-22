@@ -42,7 +42,7 @@ describe('Testing the Iiko Service', () => {
   })
 
   it('Should create categories and products', async () => {
-    await service.syncProducts()
+    await service.updateProducts()
     expect(spyFetch).toHaveBeenCalledTimes(4)
     const categoriesCount = await orm.em.count(Category)
     const categoryProductCount1 = await orm.em.count(Product, { category: 1 })
@@ -53,11 +53,11 @@ describe('Testing the Iiko Service', () => {
     expect(categoryProductCount1).toBe(9)
     expect(categoryProductCount2).toBe(18)
     expect(categoryImageCount1).toBe(1)
-    expect(produtctImageCount1).toBe(21)
+    expect(produtctImageCount1).toBe(20)
   })
 
   it('Should add category and product and exist items shouldn\'t be changed', async () => {
-    await service.syncProducts()
+    await service.updateProducts()
     expect(spyFetch).toHaveBeenCalledTimes(1)
     const categoriesCount = await orm.em.count(Category, { isDeleted: false })
     const categoryProductCount1 = await orm.em.count(Product, { category: 1, isDeleted: false })
@@ -70,11 +70,11 @@ describe('Testing the Iiko Service', () => {
     expect(categoryProductCount2).toBe(18)
     expect(categoryProductCount3).toBe(1)
     expect(categoryImageCount1).toBe(1)
-    expect(produtctImageCount1).toBe(21)
+    expect(produtctImageCount1).toBe(20)
   })
 
   it('Should set deleted one category and its products', async () => {
-    await service.syncProducts()
+    await service.updateProducts()
     expect(spyFetch).toHaveBeenCalledTimes(1)
     const categoriesCount = await orm.em.count(Category, { isDeleted: false })
     const categoryProductCount1 = await orm.em.count(Product, { category: 1, isDeleted: false })
@@ -87,7 +87,7 @@ describe('Testing the Iiko Service', () => {
     expect(categoryProductCount2).toBe(18)
     expect(categoryProductCount3).toBe(1)
     expect(categoryImageCount1).toBe(0)
-    expect(produtctImageCount1).toBe(12)
+    expect(produtctImageCount1).toBe(11)
   })
 
   afterAll(async () => {

@@ -101,9 +101,10 @@ export class OrderService {
       return order.toJSON()
     } catch (e) {
       if (e instanceof UniqueConstraintViolationException) {
-        this.em.nativeUpdate(OrderItem, { order: orderId, product: productId }, { amount })
+        await this.em.nativeUpdate(OrderItem, { order: orderId, product: productId }, { amount })
+      } else {
+        throw e
       }
-      throw e
     }
   }
 
