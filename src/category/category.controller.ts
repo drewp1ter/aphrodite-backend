@@ -1,4 +1,4 @@
-import { Controller, HttpStatus, Get } from '@nestjs/common'
+import { Controller, HttpStatus, Get, Param, ParseIntPipe } from '@nestjs/common'
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger'
 import { CategoryService } from './category.service'
 
@@ -12,5 +12,12 @@ export class CategoryController {
   @Get()
   async findAll() {
     return this.productService.findAll()
+  }
+
+  @ApiOperation({ summary: 'Get category' })
+  @ApiResponse({ status: HttpStatus.OK })
+  @Get(':categoryId')
+  async findOne(@Param('categoryId', ParseIntPipe) categoryId: number) {
+    return this.productService.findOne(categoryId)
   }
 }

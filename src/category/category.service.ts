@@ -10,7 +10,11 @@ export class CategoryService {
     private readonly categoryRepository: CategoryRepository,
   ) {}
 
+  async findOne(categoryId) {
+    return this.categoryRepository.findOne(categoryId, { fields: ['id', 'name'] })
+  }
+
   async findAll() {
-    return this.categoryRepository.findAll({ where: { isDeleted: false }, orderBy: { order: 'ASC' } })
+    return this.categoryRepository.findAll({ where: { isDeleted: false }, orderBy: { order: 'ASC' }, populate: ['images'] })
   }
 }

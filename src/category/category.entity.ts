@@ -17,7 +17,7 @@ export class Category extends IikoEntity {
     this.updatedAt = partial.updatedAt
   }
 
-  @OneToMany(() => CategoryImage, image => image.category, { orphanRemoval: true, eager: true })
+  @OneToMany(() => CategoryImage, image => image.category, { orphanRemoval: true })
   images = new Collection<CategoryImage>(this)
 
   @OneToMany(() => Product, (product) => product.category, { orphanRemoval: true, eager: false })

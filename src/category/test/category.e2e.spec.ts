@@ -30,10 +30,19 @@ describe('Category', () => {
   })
 
   it('GET /categories => should return list of categories', async () => {
-    const categories = (await orm.em.findAll(Category)).map((category) => category.toJSON())
+    const categories = (await orm.em.findAll(Category, { populate: ['images'] })).map((category) => category.toJSON())
     const res = await request(app.getHttpServer()).get(`/categories`)
     expect(res.status).toBe(200)
     expect(res.body).toEqual(categories)
+  })
+
+  it('GET /categories/1 => should return category', async () => {
+    const res = await request(app.getHttpServer()).get(`/categories/1`)
+    expect(res.status).toBe(200)
+    expect(res.body).toEqual({
+      id: 1,
+      name: expect.anything()
+    })
   })
 
   afterAll(async () => {
