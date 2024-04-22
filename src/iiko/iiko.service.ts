@@ -99,6 +99,11 @@ export class IikoService {
       const updatedProductImagesIds = updatedProductImages.map((updatedProductImage) => updatedProductImage.id)
       await em.nativeDelete(CategoryImage, { id: { $nin: updatedCategoryImagesIds }, type: 'from_iiko' })
       await em.nativeDelete(ProductImage, { id: { $nin: updatedProductImagesIds }, type: 'from_iiko' })
+
+      return {
+        totalCategories: updatedCategories.length,
+        totalProducts: updatedProducts.length
+      }
     })
   }
 

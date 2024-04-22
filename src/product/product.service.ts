@@ -4,6 +4,7 @@ import { InjectRepository } from '@mikro-orm/nestjs'
 import { Product } from './product.entity'
 import { ProductRepository } from './product.repository'
 import { config } from '../config'
+import { Category } from '../category/category.entity'
 
 @Injectable()
 export class ProductService {
@@ -13,8 +14,8 @@ export class ProductService {
     private readonly productRepository: ProductRepository
   ) {}
 
-  async findByCategoryId(categotyId: number) {
-    return this.productRepository.findAll({ where: { category: categotyId, isDeleted: false }, orderBy: { order: 'ASC' }, populate: ['images'] })
+  async findByCategoryId(categoryId: number) {
+    return this.productRepository.findAll({ where: { category: categoryId, isDeleted: false }, orderBy: { order: 'ASC' }, populate: ['images'] })
   }
 
   async find({ query, page = 1, pageSize = config.defaultPageSize }: FindProps) {

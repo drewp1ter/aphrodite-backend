@@ -1,3 +1,6 @@
+import { config as dotenvConfig } from 'dotenv'
+dotenvConfig()
+
 const defaultConfig = {
   debug: false,
   defaultPageSize: 30,
