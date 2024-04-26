@@ -726,6 +726,138 @@
           "nullable": false,
           "mappedType": "integer"
         },
+        "tag": {
+          "name": "tag",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        }
+      },
+      "name": "tag",
+      "indexes": [
+        {
+          "columnNames": [
+            "tag"
+          ],
+          "composite": false,
+          "keyName": "tag_tag_unique",
+          "constraint": true,
+          "primary": false,
+          "unique": true
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "product_id": {
+          "name": "product_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "tag_id": {
+          "name": "tag_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        }
+      },
+      "name": "product_tag",
+      "indexes": [
+        {
+          "columnNames": [
+            "product_id"
+          ],
+          "composite": false,
+          "keyName": "product_tag_product_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "tag_id"
+          ],
+          "composite": false,
+          "keyName": "product_tag_tag_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "product_id",
+            "tag_id"
+          ],
+          "composite": true,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "product_tag_product_id_foreign": {
+          "constraintName": "product_tag_product_id_foreign",
+          "columnNames": [
+            "product_id"
+          ],
+          "localTableName": "product_tag",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "product",
+          "updateRule": "cascade"
+        },
+        "product_tag_tag_id_foreign": {
+          "constraintName": "product_tag_tag_id_foreign",
+          "columnNames": [
+            "tag_id"
+          ],
+          "localTableName": "product_tag",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "tag",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "mappedType": "integer"
+        },
         "created_at": {
           "name": "created_at",
           "type": "datetime",

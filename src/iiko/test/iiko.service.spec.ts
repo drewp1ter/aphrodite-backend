@@ -9,6 +9,8 @@ import { Category } from '../../category/category.entity'
 import { Product } from '../../product/product.entity'
 import { CategoryImage } from '../../category-image/category-image.entity'
 import { ProductImage } from '../../product-image/product-image.entity'
+import { Tag } from '../../product/tag.entity'
+import { ProductTag } from '../../product/product-tag.entity'
 
 describe('Testing the Iiko Service', () => {
   let app: INestApplication
@@ -65,12 +67,16 @@ describe('Testing the Iiko Service', () => {
     const categoryProductCount3 = await orm.em.count(Product, { category: 3, isDeleted: false })
     const categoryImageCount1 = await orm.em.count(CategoryImage)
     const produtctImageCount1 = await orm.em.count(ProductImage)
+    const tagCount = await orm.em.count(Tag)
+    const productTagCount = await orm.em.count(ProductTag)
     expect(categoriesCount).toBe(3)
     expect(categoryProductCount1).toBe(9)
     expect(categoryProductCount2).toBe(18)
     expect(categoryProductCount3).toBe(1)
     expect(categoryImageCount1).toBe(1)
     expect(produtctImageCount1).toBe(20)
+    expect(tagCount).toBe(6)
+    expect(productTagCount).toBe(54)
   })
 
   it('Should set deleted one category and its products', async () => {

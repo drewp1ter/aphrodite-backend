@@ -4,7 +4,6 @@ import { InjectRepository } from '@mikro-orm/nestjs'
 import { Product } from './product.entity'
 import { ProductRepository } from './product.repository'
 import { config } from '../config'
-import { Category } from '../category/category.entity'
 
 @Injectable()
 export class ProductService {
@@ -20,8 +19,10 @@ export class ProductService {
 
   async find({ query, page = 1, pageSize = config.defaultPageSize }: FindProps) {
     const offset = (page - 1) * pageSize
+    const _query = query.trim().toLocaleLowerCase()
+    const tags = _query.split(' ')
     return this.productRepository.findAll({
-      where: { $or: [{ name: { $fulltext: query } }, { category: { name: { $fulltext: query } } }] },
+      where: { $or: [{ name: { $fulltext: _query } }, { category: { name: { $fulltext: _query } } }, { tags: { tag: { $in: tags } } }] },
       limit: pageSize,
       offset,
       populate: ['images']

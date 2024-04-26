@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20240421154128 extends Migration {
+export class Migration20240426211421 extends Migration {
 
   async up(): Promise<void> {
     this.addSql('create table `address` (`id` int unsigned not null auto_increment primary key, `created_at` datetime null default current_timestamp, `updated_at` datetime null default current_timestamp, `city` varchar(255) not null, `address` text not null) default character set utf8mb4 engine = InnoDB;');
@@ -24,6 +24,13 @@ export class Migration20240421154128 extends Migration {
 
     this.addSql('create table `role` (`id` int unsigned not null auto_increment primary key, `role` enum(\'user\', \'admin\') not null) default character set utf8mb4 engine = InnoDB;');
     this.addSql('alter table `role` add unique `role_role_unique`(`role`);');
+
+    this.addSql('create table `tag` (`id` int unsigned not null auto_increment primary key, `tag` varchar(255) not null) default character set utf8mb4 engine = InnoDB;');
+    this.addSql('alter table `tag` add unique `tag_tag_unique`(`tag`);');
+
+    this.addSql('create table `product_tag` (`product_id` int unsigned not null, `tag_id` int unsigned not null, primary key (`product_id`, `tag_id`)) default character set utf8mb4 engine = InnoDB;');
+    this.addSql('alter table `product_tag` add index `product_tag_product_id_index`(`product_id`);');
+    this.addSql('alter table `product_tag` add index `product_tag_tag_id_index`(`tag_id`);');
 
     this.addSql('create table `user` (`id` int unsigned not null auto_increment primary key, `created_at` datetime null default current_timestamp, `updated_at` datetime null default current_timestamp, `name` varchar(255) not null, `email` varchar(255) null, `phone` varchar(255) not null, `password` varchar(255) not null, `is_email_confirmed` tinyint(1) not null default false, `is_phone_confirmed` tinyint(1) not null default false) default character set utf8mb4 engine = InnoDB;');
     this.addSql('alter table `user` add unique `user_email_unique`(`email`);');
@@ -51,6 +58,9 @@ export class Migration20240421154128 extends Migration {
     this.addSql('alter table `product` add constraint `product_category_id_foreign` foreign key (`category_id`) references `category` (`id`) on update cascade;');
 
     this.addSql('alter table `product_image` add constraint `product_image_product_id_foreign` foreign key (`product_id`) references `product` (`id`) on update cascade;');
+
+    this.addSql('alter table `product_tag` add constraint `product_tag_product_id_foreign` foreign key (`product_id`) references `product` (`id`) on update cascade;');
+    this.addSql('alter table `product_tag` add constraint `product_tag_tag_id_foreign` foreign key (`tag_id`) references `tag` (`id`) on update cascade;');
 
     this.addSql('alter table `order` add constraint `order_customer_id_foreign` foreign key (`customer_id`) references `user` (`id`) on update cascade;');
     this.addSql('alter table `order` add constraint `order_address_id_foreign` foreign key (`address_id`) references `address` (`id`) on update cascade on delete set null;');

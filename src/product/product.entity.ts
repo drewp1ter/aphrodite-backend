@@ -1,16 +1,29 @@
-import { Entity, EntityRepositoryType, Property, ManyToOne, EntityDTO, Collection, wrap, Index, types, Check, OneToMany } from '@mikro-orm/core'
+import {
+  Entity,
+  EntityRepositoryType,
+  Property,
+  ManyToOne,
+  EntityDTO,
+  Collection,
+  wrap,
+  Index,
+  types,
+  Check,
+  OneToMany,
+  ManyToMany
+} from '@mikro-orm/core'
 import { IikoEntity } from '../shared/entities/iiko.entity'
 import { Category } from '../category/category.entity'
 import { ProductRepository } from './product.repository'
 import { ProductImage } from '../product-image/product-image.entity'
+import { ProductTag } from './product-tag.entity'
+import { Tag } from './tag.entity'
 
 @Entity({ repository: () => ProductRepository })
 export class Product extends IikoEntity {
   [EntityRepositoryType]?: ProductRepository
 
-  constructor(
-    partial: RequiredBy<Product, 'name' | 'price' | 'category'>
-  ) {
+  constructor(partial: RequiredBy<Product, 'name' | 'price' | 'category'>) {
     super()
     this.iikoId = partial.iikoId
     this.name = partial.name
@@ -19,7 +32,7 @@ export class Product extends IikoEntity {
     this.measureUnit = partial.measureUnit
     this.proteins = partial.proteins
     this.fats = partial.fats
-    this.carbohydrates = partial.carbohydrates 
+    this.carbohydrates = partial.carbohydrates
     this.flags = partial.flags
     this.calories = partial.calories
     this.price = partial.price
@@ -29,8 +42,11 @@ export class Product extends IikoEntity {
   @ManyToOne({ hidden: true, lazy: true })
   category!: Category
 
-  @OneToMany(() => ProductImage, image => image.product, { orphanRemoval: true, eager: true })
+  @OneToMany(() => ProductImage, (image) => image.product, { orphanRemoval: true, eager: true })
   images = new Collection<ProductImage>(this)
+
+  @ManyToMany({ entity: () => Tag, pivotEntity: () => ProductTag, inversedBy: 'products' })
+  tags = new Collection<Tag>(this)
 
   @Property()
   @Index({ type: 'fulltext' })

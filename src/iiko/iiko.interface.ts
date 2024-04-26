@@ -44,7 +44,7 @@ export interface IProduct {
   name: string
   description: string | null
   additionalInfo: string | null
-  tags: string[]
+  tags: string[] | null
   isDeleted: boolean
   seoDescription: string | null
   seoText: string | null

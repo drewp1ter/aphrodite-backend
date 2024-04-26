@@ -6,6 +6,8 @@ import { IGroup, INomenclature } from './iiko.interface'
 import * as api from './iiko.api'
 import { CategoryImage } from '../category-image/category-image.entity'
 import { ProductImage } from '../product-image/product-image.entity'
+import { Tag } from '../product/tag.entity'
+import { ProductTag } from '../product/product-tag.entity'
 import { config } from '../config'
 
 @Injectable()
@@ -70,11 +72,6 @@ export class IikoService {
 
       const updatedProducts = await em.upsertMany(Product, actualProducts)
 
-      const updatedCategoriesIds = updatedCategories.map((category) => category.iikoId!)
-      const updatedProductsIds = updatedProducts.map((product) => product.iikoId!)
-      await em.nativeUpdate(Category, { iikoId: { $nin: updatedCategoriesIds } }, { isDeleted: true })
-      await em.nativeUpdate(Product, { iikoId: { $nin: updatedProductsIds } }, { isDeleted: true })
-
       const categoryImages = nomenclature.groups.filter(this.isGroupValid).reduce<CategoryImage[]>((result, group) => {
         const category = updatedCategories.find((category) => category.iikoId === group.id)
         category &&
@@ -93,8 +90,44 @@ export class IikoService {
         return result
       }, [])
 
+      const tags = nomenclature.products.reduce<Tag[]>((result, iikoProduct) => {
+        iikoProduct.tags?.forEach((tag) =>
+          tag
+            .toLowerCase()
+            .split(' ')
+            .filter(Boolean)
+            .forEach((_tag) => result.push(new Tag(_tag.replace('"', '').trim())))
+        )
+        return result
+      }, [])
+
+      let updatedTags: Tag[] = []
+      if (tags.length) {
+        updatedTags = await em.upsertMany(Tag, tags)
+      }
+
+      const productTags = updatedTags.reduce<ProductTag[]>((result, tag) => {
+        nomenclature.products.forEach((iikoProduct) => {
+          iikoProduct.tags?.forEach((_tag) => {
+            if (_tag.toLowerCase().includes(tag.tag)) {
+              const product = updatedProducts.find((product) => product.iikoId === iikoProduct.id)
+              product && result.push(new ProductTag({ product, tag }))
+            }
+          })
+        })
+        return result
+      }, [])
+
+      const updatedProductTags = await em.upsertMany(ProductTag, productTags)
+
       const updatedCategoryImages = await em.upsertMany(CategoryImage, categoryImages)
       const updatedProductImages = await em.upsertMany(ProductImage, productImages)
+
+      const updatedCategoriesIds = updatedCategories.map((category) => category.iikoId!)
+      const updatedProductsIds = updatedProducts.map((product) => product.iikoId!)
+      await em.nativeUpdate(Category, { iikoId: { $nin: updatedCategoriesIds } }, { isDeleted: true })
+      await em.nativeUpdate(Product, { iikoId: { $nin: updatedProductsIds } }, { isDeleted: true })
+
       const updatedCategoryImagesIds = updatedCategoryImages.map((updatedCategoryImage) => updatedCategoryImage.id)
       const updatedProductImagesIds = updatedProductImages.map((updatedProductImage) => updatedProductImage.id)
       await em.nativeDelete(CategoryImage, { id: { $nin: updatedCategoryImagesIds }, type: 'from_iiko' })
