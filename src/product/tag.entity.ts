@@ -10,9 +10,6 @@ export class Tag {
   @PrimaryKey()
   id!: number
 
-  @ManyToMany({ entity: () => Product, mappedBy: (product) => product.tags, hidden: true })
-  products = new Collection<Product>(this)
-
   @Property({ unique: true })
   tag: string
 }

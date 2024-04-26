@@ -45,7 +45,7 @@ export class Product extends IikoEntity {
   @OneToMany(() => ProductImage, (image) => image.product, { orphanRemoval: true, eager: true })
   images = new Collection<ProductImage>(this)
 
-  @ManyToMany({ entity: () => Tag, pivotEntity: () => ProductTag, inversedBy: 'products' })
+  @ManyToMany({ entity: () => Tag, pivotEntity: () => ProductTag, owner: true })
   tags = new Collection<Tag>(this)
 
   @Property()
