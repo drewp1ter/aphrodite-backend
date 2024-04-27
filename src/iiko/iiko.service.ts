@@ -94,9 +94,9 @@ export class IikoService {
         iikoProduct.tags?.forEach((tag) =>
           tag
             .toLowerCase()
-            .split(' ')
+            .split(/[\s-]+/)
             .filter(Boolean)
-            .forEach((_tag) => result.push(new Tag(_tag.replace('"', '').trim())))
+            .forEach((_tag) => result.push(new Tag(_tag.replace(/["#]/g, '').trim())))
         )
         return result
       }, [])
@@ -107,7 +107,7 @@ export class IikoService {
       }
 
       const productTags = updatedTags.reduce<ProductTag[]>((result, tag) => {
-        nomenclature.products.forEach((iikoProduct) => {
+        nomenclature?.products.forEach((iikoProduct) => {
           iikoProduct.tags?.forEach((_tag) => {
             if (_tag.toLowerCase().includes(tag.tag)) {
               const product = updatedProducts.find((product) => product.iikoId === iikoProduct.id)
@@ -118,11 +118,11 @@ export class IikoService {
         return result
       }, [])
 
-      const updatedProductTags = await em.upsertMany(ProductTag, productTags)
-
+      await em.upsertMany(ProductTag, productTags)
       const updatedCategoryImages = await em.upsertMany(CategoryImage, categoryImages)
       const updatedProductImages = await em.upsertMany(ProductImage, productImages)
 
+      const updatedTagsIds = updatedTags.map(tag => tag.id)
       const updatedCategoriesIds = updatedCategories.map((category) => category.iikoId!)
       const updatedProductsIds = updatedProducts.map((product) => product.iikoId!)
       await em.nativeUpdate(Category, { iikoId: { $nin: updatedCategoriesIds } }, { isDeleted: true })
@@ -132,6 +132,8 @@ export class IikoService {
       const updatedProductImagesIds = updatedProductImages.map((updatedProductImage) => updatedProductImage.id)
       await em.nativeDelete(CategoryImage, { id: { $nin: updatedCategoryImagesIds }, type: 'from_iiko' })
       await em.nativeDelete(ProductImage, { id: { $nin: updatedProductImagesIds }, type: 'from_iiko' })
+      await em.nativeDelete(ProductTag, { tag: { $nin: updatedTagsIds } })
+      await em.nativeDelete(Tag, { id: { $nin: updatedTagsIds } })
 
       return {
         totalCategories: updatedCategories.length,
