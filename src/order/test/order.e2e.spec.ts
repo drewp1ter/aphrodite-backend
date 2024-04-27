@@ -43,6 +43,9 @@ describe('Order', () => {
     const jwtService = moduleRef.get(JwtService)
     jwtUser = jwtService.sign({ id: user.id, roles: user.roles.map((role) => role.role) })
     jwtAdmin = jwtService.sign({ id: admin.id, roles: admin.roles.map((role) => role.role) })
+
+    const dummyFetch: any = () => {}
+    jest.spyOn(global, 'fetch').mockImplementation(dummyFetch)
   })
 
   it('POST /orders => should create the new order', async () => {

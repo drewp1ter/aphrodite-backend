@@ -1,5 +1,5 @@
 import { config as dotenvConfig } from 'dotenv'
-dotenvConfig()
+if (process.env.NODE_ENV !== 'test') dotenvConfig()
 
 const defaultConfig = {
   debug: false,
