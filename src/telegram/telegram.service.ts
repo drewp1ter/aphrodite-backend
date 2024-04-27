@@ -1,6 +1,7 @@
 import { OnEvent } from '@nestjs/event-emitter'
 import { Order } from '../order/order.entity'
 import { config } from '../config'
+
 export class TelegramService {
   @OnEvent('order.created')
   async handleOrderCreatedEvent(order: Order) {
