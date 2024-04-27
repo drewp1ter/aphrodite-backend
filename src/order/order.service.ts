@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { EntityManager, UniqueConstraintViolationException } from '@mikro-orm/core'
 import { InjectRepository } from '@mikro-orm/nestjs'
+import { EventEmitter2 } from '@nestjs/event-emitter'
 import { UserRepository } from '../user/user.repository'
 import { Address } from '../address/address.entity'
 import { AddressRepository } from '../address/address.repository'
@@ -19,6 +20,7 @@ import { ProductRepository } from '../product/product.repository'
 export class OrderService {
   constructor(
     private readonly em: EntityManager,
+    private readonly eventEmitter: EventEmitter2,
     @InjectRepository(Order)
     private readonly orderRepository: OrderRepository,
     @InjectRepository(User)
@@ -26,7 +28,7 @@ export class OrderService {
     @InjectRepository(Address)
     private readonly addressRepository: AddressRepository,
     @InjectRepository(Product)
-    private readonly productRepository: ProductRepository
+    private readonly productRepository: ProductRepository,
   ) {}
 
   async create(dto: CreateOrderDto) {
@@ -65,6 +67,8 @@ export class OrderService {
     })
 
     await this.em.refresh(order)
+    this.eventEmitter.emit('order.created', order)
+
     return order!.toJSON()
   }
 
