@@ -24,6 +24,10 @@ const defaultConfig = {
     apiLogin: '',
     organizationId: '',
     categoryMarker: '#'
+  },
+  telegram: {
+    token: '',
+    chatId: ''
   }
 }
 
@@ -51,6 +55,10 @@ export const config = assignDefined(defaultConfig, {
     apiLogin: env.IIKO_API_LOGIN,
     organizationId: env.IIKO_ORGANIZATION_ID,
     categoryMarker: env.IIKO_CATEGORY_MARKER
+  }),
+  telegram: assignDefined(defaultConfig.telegram, {
+    token: env.TELEGRAM_TOKEN,
+    chatId: env.TELEGRAM_CHAT_ID
   })
 })
 

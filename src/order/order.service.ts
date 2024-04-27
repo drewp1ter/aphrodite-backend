@@ -66,7 +66,7 @@ export class OrderService {
       return order
     })
 
-    await this.em.refresh(order)
+    await this.em.refresh(order, {  populate: ['items', 'items.product', 'items.product.category'] })
     this.eventEmitter.emit('order.created', order)
 
     return order!.toJSON()
