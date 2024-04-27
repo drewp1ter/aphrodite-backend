@@ -3,7 +3,7 @@ dotenvConfig()
 
 const defaultConfig = {
   debug: false,
-  defaultPageSize: 30,
+  defaultPageSize: 100,
   jwt: {
     secret: 'changeme',
     expiresIn: '1d'
