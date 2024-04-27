@@ -14,8 +14,6 @@ export class TelegramService {
       `Заказ:\n${order.items.map((item) => `${item.product.category.name}: ${item.product.name} * ${item.amount}\n`).join('')}` +
       '```'
 
-    console.log(config.telegram.chatId)
-
     const res = await fetch(`https://api.telegram.org/bot${config.telegram.token}/sendMessage`, {
       method: 'POST',
       headers: { 
@@ -24,7 +22,5 @@ export class TelegramService {
       },
       body: JSON.stringify({ chat_id: config.telegram.chatId, parse_mode: 'Markdown', text })
     })
-
-    console.log(res.status)
   }
 }
