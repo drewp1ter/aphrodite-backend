@@ -134,6 +134,7 @@ export class IikoService {
       await em.nativeDelete(ProductImage, { id: { $nin: updatedProductImagesIds }, type: 'from_iiko' })
       await em.nativeDelete(ProductTag, { tag: { $nin: updatedTagsIds } })
       await em.nativeDelete(Tag, { id: { $nin: updatedTagsIds } })
+      await em.commit()
 
       return {
         totalCategories: updatedCategories.length,
