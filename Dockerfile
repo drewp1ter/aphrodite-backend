@@ -17,6 +17,8 @@ COPY . .
 
 RUN yarn build
 
+EXPOSE 3000
+
 ENTRYPOINT ["dumb-init", "--"]
 
 CMD ["yarn", "start:prod"]
