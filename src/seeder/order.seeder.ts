@@ -6,6 +6,7 @@ import { ProductFactory } from '../product/product.factory'
 import { CategoryFactory } from '../category/category.factory'
 import { OrderFactory } from '../order/order.factory'
 import { ProductImageFactory } from '../product-image/product-image.factory'
+import { hasher } from 'node-object-hash'
 import { Role } from '../role/role.entity'
 import { RoleEnum } from '../role/role.enum'
 import { OrderItemFactory } from '../order-item/order-item.factory'
@@ -58,6 +59,7 @@ export class OrderSeeder extends Seeder {
           order.customer = user
           order.address = await new AddressFactory(em).createOne()
           order.items.add(new OrderItemFactory(em).makeOne({ offeredPrice: product.price, product }))
+          order.itemsHash = hasher({ sort: true }).hash(order.items.toJSON())
         })
         .make(2)
         

@@ -10,9 +10,11 @@ import { OrderModule } from './order/order.module'
 import { AuthModule } from './auth/auth.module'
 import { IikoModule } from './iiko/iiko.module'
 import { TelegramModule } from './telegram/telegram.module'
+import { YookassaModule } from './yookassa/yookassa.module'
 import { User } from './user/user.entity'
 import { config } from './config'
 import { AdminSeeder } from './seeder/admin.seeder'
+
 @Module({
   controllers: [AppController],
   imports: [
@@ -24,10 +26,12 @@ import { AdminSeeder } from './seeder/admin.seeder'
     CategoryModule,
     OrderModule,
     IikoModule,
-    TelegramModule
+    TelegramModule,
+    YookassaModule
   ],
   providers: []
 })
+
 export class AppModule implements NestModule, OnModuleInit {
   constructor(private readonly orm: MikroORM) {}
 

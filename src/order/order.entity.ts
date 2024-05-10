@@ -4,18 +4,7 @@ import { User } from '../user/user.entity'
 import { Address } from '../address/address.entity'
 import { OrderItem } from '../order-item/order-item.entity'
 import { OrderRepository } from './order.repository'
-
-export enum OrderPaymentType {
-  Cash = 'cash',
-  Online = 'online'
-}
-
-export enum OrderStatus {
-  New = 'new',
-  Payed = 'payed',
-  Canceled = 'canceled',
-  Confirmed = 'confirmed'
-}
+import { OrderPaymentType, OrderStatus } from './order.interface'
 
 @Entity({ repository: () => OrderRepository })
 export class Order extends BaseEntity {
@@ -45,8 +34,11 @@ export class Order extends BaseEntity {
   @Property()
   paymentType!: OrderPaymentType
 
+  @Property({ hidden: true })
+  itemsHash!: string
+
   @Property({ default: '', hidden: true, lazy: true, index: true })
-  confirmationToken!: string
+  paymentId!: string
 
   @Property({ persist: false })
   get total(): string {

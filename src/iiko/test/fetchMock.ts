@@ -5,7 +5,7 @@ import iikoResponse3 from './iiko-response-3'
 let tokenRequested = false
 let requestsCount = 0
 
-export const fetchMock = async (req: string | URL | Request, init?: RequestInit): Promise<Response> => {
+export const fetchMock = async (req: string | URL | Request, init?: any): Promise<Response> => {
   if (req.toString().indexOf('/access_token') !== -1) {
     return Promise.resolve({
       ok: true,
@@ -21,7 +21,7 @@ export const fetchMock = async (req: string | URL | Request, init?: RequestInit)
     } as Response)
   }
 
-  if (init?.headers && init.headers['Authorization'] === 'Bearer bad_token') {
+  if (init?.headers && init.headers.get('Authorization') === 'Bearer bad_token') {
     return Promise.resolve({
       ok: false,
       status: 401,

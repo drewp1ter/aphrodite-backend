@@ -1,13 +1,13 @@
 import { IsNotEmpty, IsPhoneNumber, MaxLength, IsArray, IsOptional, IsEnum } from 'class-validator'
 import { CreateAddressDto } from '../../address/dto/create-address.dto'
 import { OrderItemDto } from '../../order-item/dto/order-item.dto'
-import { OrderPaymentType } from '../order.entity'
+import { OrderPaymentType } from '../order.interface'
 
 export class CreateOrderDto {
-  @IsPhoneNumber('RU')
+  @IsPhoneNumber('RU', { message: 'Неверный формат телефонного номера' })
   readonly phone!: string
   
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'Имя должно быть не пустым' })
   readonly name!: string
 
   @IsOptional()
@@ -18,7 +18,7 @@ export class CreateOrderDto {
   @IsEnum(OrderPaymentType)
   readonly paymentType!: OrderPaymentType
 
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'Адрес должен быть не пустым' })
   readonly address!: CreateAddressDto
 
   @IsNotEmpty()

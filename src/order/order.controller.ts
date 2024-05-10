@@ -1,22 +1,57 @@
-import { Controller, Post, Body, UsePipes, BadRequestException, ParseIntPipe, Get, Param, Delete, Query, Patch } from '@nestjs/common'
+import {
+  Controller,
+  Post,
+  Body,
+  UsePipes,
+  BadRequestException,
+  InternalServerErrorException,
+  ParseIntPipe,
+  Get,
+  Param,
+  Delete,
+  Query,
+  Patch
+} from '@nestjs/common'
 import { ForeignKeyConstraintViolationException, CheckConstraintViolationException } from '@mikro-orm/mysql'
 import { ValidationPipe } from '../shared/pipes/validation.pipe'
 import { OrderService } from './order.service'
+import { YookassaService } from '../yookassa/yookassa.service'
 import { CreateOrderDto } from './dto/create-order.dto'
 import { Roles } from '../role/roles.decorator'
 import { User } from '../user/user.decorator'
+import { config } from '../config'
 import { OrderItemDto } from '../order-item/dto/order-item.dto'
 
 @Controller('orders')
 export class OrderController {
-  constructor(private readonly orderService: OrderService) {}
+  constructor(private readonly orderService: OrderService, private readonly yookassaService: YookassaService) {}
 
   @UsePipes(new ValidationPipe())
   @Post()
   async create(@Body() createOrderDto: CreateOrderDto) {
     try {
-      const res = await this.orderService.create(createOrderDto)
-      return res
+      const order = await this.orderService.create(createOrderDto)
+
+      if (createOrderDto.paymentType === 'online') {
+        const description = `Заказ №${order.id}\n${order.items
+          .map((item) => `${item.product.category.name}: ${item.product.name} * ${item.amount}\n`)
+          .join('')}`
+
+        const payment = await this.yookassaService.createPayment({
+          amount: parseFloat(order.total),
+          idempotenceKey: order.id.toString(),
+          description,
+          metadata: { orderId: order.id }
+        })
+
+        if (payment.status === 'pending') {
+          return { redirectUrl: payment.confirmation.confirmation_url }
+        }
+
+        throw new InternalServerErrorException('The payment system returns bad status.')
+      }
+
+      return { redirectUrl: config.thankYouPage }
     } catch (e) {
       if (e instanceof ForeignKeyConstraintViolationException) {
         throw new BadRequestException('Product not found.')
@@ -24,7 +59,7 @@ export class OrderController {
       if (e instanceof CheckConstraintViolationException) {
         throw new BadRequestException('Item amount is incorrect.')
       }
-      throw new BadRequestException()
+      throw e
     }
   }
 

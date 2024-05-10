@@ -8,7 +8,8 @@ import mikroConfig from '../../mikro-orm.config'
 import { AppModule } from '../../app.module'
 import { OrderSeeder } from '../../seeder/order.seeder'
 import { Product } from '../../product/product.entity'
-import { Order, OrderStatus } from '../order.entity'
+import { Order } from '../order.entity'
+import { OrderStatus } from '../order.interface'
 import { User } from '../../user/user.entity'
 import { OrderItem } from '../../order-item/order-item.entity'
 import { Address } from '../../address/address.entity'
@@ -44,7 +45,7 @@ describe('Order', () => {
     jwtUser = jwtService.sign({ id: user.id, roles: user.roles.map((role) => role.role) })
     jwtAdmin = jwtService.sign({ id: admin.id, roles: admin.roles.map((role) => role.role) })
 
-    const dummyFetch: any = () => {}
+    const dummyFetch: any = () => ({ ok: true, status: 200 })
     jest.spyOn(global, 'fetch').mockImplementation(dummyFetch)
   })
 
@@ -56,7 +57,7 @@ describe('Order', () => {
         phone: faker.helpers.fromRegExp('+79[0-9]{9}'),
         name: faker.person.fullName(),
         comment: faker.lorem.words(8),
-        paymentType: 'online',
+        paymentType: 'cash',
         address: {
           city: faker.location.city(),
           address: faker.location.streetAddress()
@@ -66,55 +67,9 @@ describe('Order', () => {
     const ordersCount = await orm.em.count(Order)
     expect(res.status).toBe(201)
     expect(ordersCount).toBe(3)
-    const createdOrder = (await orm.em.findAll(Order, { populate: ['address'] })).at(-1)!.toJSON()
     expect(res.body).toEqual({
-      id: createdOrder.id,
-      createdAt: createdOrder.createdAt,
-      updatedAt: createdOrder.updatedAt,
-      address: {
-        id: createdOrder.address!.id,
-        city: createdOrder.address!.city,
-        address: createdOrder.address!.address,
-        createdAt: expect.anything(),
-        updatedAt: expect.anything()
-      },
-      comment: createdOrder.comment,
-      paymentType: createdOrder.paymentType,
-      items: [
-        {
-          amount: createdOrder.items[0].amount,
-          offeredPrice: createdOrder.items[0].offeredPrice,
-          product: {
-            calories: createdOrder.items[0].product.calories,
-            carbohydrates: createdOrder.items[0].product.carbohydrates,
-            description: createdOrder.items[0].product.description,
-            fats: createdOrder.items[0].product.fats,
-            flags: createdOrder.items[0].product.flags,
-            id: createdOrder.items[0].product.id,
-            images: [
-              {
-                id: createdOrder.items[0].product.images[0].id,
-                type: createdOrder.items[0].product.images[0].type,
-                url: createdOrder.items[0].product.images[0].url,
-                createdAt: expect.anything(),
-                updatedAt: expect.anything()
-              }
-            ],
-            name: createdOrder.items[0].product.name,
-            price: createdOrder.items[0].product.price,
-            proteins: createdOrder.items[0].product.proteins,
-            weight: createdOrder.items[0].product.weight,
-            measureUnit: createdOrder.items[0].product.measureUnit,
-            createdAt: expect.anything(),
-            updatedAt: expect.anything()
-          }
-        },
-        { product: createdOrder.items[1].product, amount: createdOrder.items[1].amount, offeredPrice: createdOrder.items[1].offeredPrice },
-        { product: createdOrder.items[2].product, amount: createdOrder.items[2].amount, offeredPrice: createdOrder.items[2].offeredPrice }
-      ],
-      total: createdOrder.total
+      redirectUrl: expect.anything()
     })
-    expect(res.body.total.toString()).toBe('36')
   })
 
   it("POST /orders => shouldn't create the new order with bad item amount", async () => {
@@ -165,7 +120,9 @@ describe('Order', () => {
   it('GET /orders/my => should get user orders', async () => {
     const res = await request(app.getHttpServer()).get(`/orders/my`).set('Authorization', `Bearer ${jwtUser}`)
     expect(res.status).toBe(200)
-    const userOrders = (await orm.em.findAll(Order, { where: { customer: user }, orderBy: { id: 'DESC' } })).map((order) => order.toJSON())
+    const userOrders = (await orm.em.findAll(Order, { where: { customer: user }, orderBy: { id: 'DESC' }, populate: ['address'] })).map((order) =>
+      order.toJSON()
+    )
     expect(userOrders.length).toBe(2)
     expect(res.body.orders).toEqual([
       {
@@ -389,5 +346,7 @@ describe('Order', () => {
     await orm.schema.clearDatabase()
     await orm.close()
     await app.close()
+
+    jest.restoreAllMocks()
   })
 })

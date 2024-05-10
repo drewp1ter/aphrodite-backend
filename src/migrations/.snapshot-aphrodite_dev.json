@@ -1053,8 +1053,17 @@
           "nullable": false,
           "mappedType": "string"
         },
-        "confirmation_token": {
-          "name": "confirmation_token",
+        "items_hash": {
+          "name": "items_hash",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "payment_id": {
+          "name": "payment_id",
           "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
@@ -1088,10 +1097,10 @@
         },
         {
           "columnNames": [
-            "confirmation_token"
+            "payment_id"
           ],
           "composite": false,
-          "keyName": "order_confirmation_token_index",
+          "keyName": "order_payment_id_index",
           "constraint": false,
           "primary": false,
           "unique": false

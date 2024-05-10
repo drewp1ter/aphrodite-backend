@@ -28,7 +28,12 @@ const defaultConfig = {
   telegram: {
     token: '',
     chatId: ''
-  }
+  },
+  yookassa: {
+    shopId: '',
+    secretKey: ''
+  },
+  thankYouPage: 'http://localhost:3001/thankyou'
 }
 
 const { env } = process
@@ -59,7 +64,12 @@ export const config = assignDefined(defaultConfig, {
   telegram: assignDefined(defaultConfig.telegram, {
     token: env.TELEGRAM_TOKEN,
     chatId: env.TELEGRAM_CHAT_ID
-  })
+  }),
+  yookassa: assignDefined(defaultConfig.yookassa, {
+    shopId: env.YOOKASSA_SHOP_ID,
+    secretKey: env.YOOKASSA_SECRET_KEY
+  }),
+  thankYouPage: env.THANK_YOU_PAGE
 })
 
 function assignDefined(target, ...sources) {

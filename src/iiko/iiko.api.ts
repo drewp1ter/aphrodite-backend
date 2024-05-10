@@ -9,11 +9,11 @@ const baseUrl = 'https://api-ru.iiko.services/api/1'
 const fetchIiko = fetchAbsolute(baseUrl)
 
 export async function accessToken(): Promise<string> {
+  const headers = new Headers()
+  headers.append('Content-Type', 'application/json')
   const res = await fetchIiko('/access_token', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
+    headers,
     body: JSON.stringify({ apiLogin: config.iiko.apiLogin })
   })
   if (res.status === 401) throw new UnauthorizedException('API login is incorrect. Please check the environment variable IIKO_API_LOGIN')
@@ -27,12 +27,13 @@ export async function accessToken(): Promise<string> {
 }
 
 export async function nomenclature(accessToken: string) {
+  const headers = new Headers()
+  headers.append('Content-Type', 'application/json')
+  headers.append('Authorization', `Bearer ${accessToken}`)
+  
   const res = await fetchIiko('/nomenclature', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${accessToken}`
-    },
+    headers,
     body: JSON.stringify({
       organizationId: config.iiko.organizationId,
       startRevision: 0
