@@ -18,7 +18,7 @@ const defaultConfig = {
     name: 'aphrodite_dev',
     password: '',
     host: 'localhost',
-    port: 3306,
+    port: 3306
   },
   iiko: {
     apiLogin: '',
@@ -36,40 +36,38 @@ const defaultConfig = {
   thankYouPage: 'http://localhost:3001/thankyou'
 }
 
-const { env } = process
-
 export const config = assignDefined(defaultConfig, {
-  debug: env.DEBUG && 'true' === env.DEBUG,
+  debug: process.env.DEBUG && 'true' === process.env.DEBUG,
   jwt: assignDefined(defaultConfig.jwt, {
-    secret: env.JWT_SECRET,
-    expiresIn: env.JWT_EXPIRES_IN
+    secret: process.env.JWT_SECRET,
+    expiresIn: process.env.JWT_EXPIRES_IN
   }),
   admin: assignDefined(defaultConfig.admin, {
-    email: env.ADMIN_EMAIL,
-    password: env.ADMIN_PASSWORD,
-    phone: env.ADMIN_PHONE
+    email: process.env.ADMIN_EMAIL,
+    password: process.env.ADMIN_PASSWORD,
+    phone: process.env.ADMIN_PHONE
   }),
   db: assignDefined(defaultConfig.db, {
-    user: env.DB_USER,
-    password: env.DB_PASSWORD,
-    name: env.DB_NAME,
-    host: env.DB_HOST,
-    port: Number(env.DB_PORT)
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    name: process.env.DB_NAME,
+    host: process.env.DB_HOST,
+    port: Number(process.env.DB_PORT)
   }),
   iiko: assignDefined(defaultConfig.iiko, {
-    apiLogin: env.IIKO_API_LOGIN,
-    organizationId: env.IIKO_ORGANIZATION_ID,
-    categoryMarker: env.IIKO_CATEGORY_MARKER
+    apiLogin: process.env.IIKO_API_LOGIN,
+    organizationId: process.env.IIKO_ORGANIZATION_ID,
+    categoryMarker: process.env.IIKO_CATEGORY_MARKER
   }),
   telegram: assignDefined(defaultConfig.telegram, {
-    token: env.TELEGRAM_TOKEN,
-    chatId: env.TELEGRAM_CHAT_ID
+    token: process.env.TELEGRAM_TOKEN,
+    chatId: process.env.TELEGRAM_CHAT_ID
   }),
   yookassa: assignDefined(defaultConfig.yookassa, {
-    shopId: env.YOOKASSA_SHOP_ID,
-    secretKey: env.YOOKASSA_SECRET_KEY
+    shopId: process.env.YOOKASSA_SHOP_ID,
+    secretKey: process.env.YOOKASSA_SECRET_KEY
   }),
-  thankYouPage: env.THANK_YOU_PAGE
+  thankYouPage: process.env.THANK_YOU_PAGE
 })
 
 function assignDefined(target, ...sources) {

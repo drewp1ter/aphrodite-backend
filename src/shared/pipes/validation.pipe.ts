@@ -16,7 +16,7 @@ export class ValidationPipe implements PipeTransform<any> {
     const object = plainToClass(metatype, value)
     const errors = await validate(object)
     if (errors.length > 0) {
-      throw new HttpException({ message: 'Input data validation failed', errors: this.buildError(errors) }, HttpStatus.BAD_REQUEST)
+      throw new HttpException({ message: 'Ошибка валидации, пожалуйста проверьте введенные вами данные', errors: this.buildError(errors) }, HttpStatus.BAD_REQUEST)
     }
     return value
   }
@@ -26,7 +26,7 @@ export class ValidationPipe implements PipeTransform<any> {
     errors.forEach((el) => {
       const prop = el.property
       Object.entries(el.constraints).forEach((constraint) => {
-        result[prop + constraint[0]] = `${constraint[1]}`
+        result[`${prop}.${constraint[0]}`] = `${constraint[1]}`
       })
     })
     return result

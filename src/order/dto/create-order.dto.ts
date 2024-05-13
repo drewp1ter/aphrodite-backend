@@ -4,6 +4,7 @@ import { OrderItemDto } from '../../order-item/dto/order-item.dto'
 import { OrderPaymentType } from '../order.interface'
 
 export class CreateOrderDto {
+  @IsNotEmpty({ message: 'Телефон должен быть не пустым' })
   @IsPhoneNumber('RU', { message: 'Неверный формат телефонного номера' })
   readonly phone!: string
   
