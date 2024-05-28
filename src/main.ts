@@ -1,10 +1,12 @@
-
 import { NestFactory } from '@nestjs/core'
+import { NestApplicationOptions } from '@nestjs/common'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
+import { LoggerService } from './shared/services/logger.service'
 import { AppModule } from './app.module'
 
 async function bootstrap() {
-  const appOptions = { cors: true }
+  const appOptions: NestApplicationOptions = { cors: true, logger: new LoggerService('Main')  }
+
   const app = await NestFactory.create(AppModule, appOptions)
   app.setGlobalPrefix('api')
 

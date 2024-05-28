@@ -49,7 +49,19 @@ export class OrderSeeder extends Seeder {
         })
         .makeOne()
 
-      em.persist(category)
+      const category2 = new CategoryFactory(em)
+        .each((category) => {
+          category.products.set(
+            new ProductFactory(em)
+              .each((product) => {
+                product.images.add(new ProductImageFactory(em).makeOne())
+              })
+              .make(1, { price: 5.99 })
+          )
+        })
+        .makeOne({ additionalInfo: '["9:00", "21:00", 1111100]' })  
+
+      em.persist([category, category2])
 
       let i = 0
 

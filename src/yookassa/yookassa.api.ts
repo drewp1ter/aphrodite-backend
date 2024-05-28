@@ -1,7 +1,7 @@
-import { HttpException } from '@nestjs/common'
 import { fetchAbsolute } from '../shared/helpers'
 import { config } from '../config'
 import { CreatePaymentRequestDto, PaymentProps, CreatePaymentResponseDto } from './yookassa.interface'
+import { HttpStatus } from '@nestjs/common'
 
 const baseUrl = 'https://api.yookassa.ru/v3'
 const fetchYoomoney = fetchAbsolute(baseUrl)
@@ -12,12 +12,12 @@ export async function payment({ amount, idempotenceKey, description, metadata }:
   headers.set('Authorization', `Basic ${Buffer.from(`${config.yookassa.shopId}:${config.yookassa.secretKey}`).toString('base64')}`)
   headers.set('Idempotence-Key', idempotenceKey)
 
-  const body: CreatePaymentRequestDto = {
+  const reqestBody: CreatePaymentRequestDto = {
     amount: { value: amount, currency: 'RUB' },
     capture: true,
     confirmation: {
       type: 'redirect',
-      return_url: config.thankYouPage,
+      return_url: config.thankYouPagePaymentOnline,
     },
     description,
     metadata
@@ -26,13 +26,18 @@ export async function payment({ amount, idempotenceKey, description, metadata }:
   const res = await fetchYoomoney('/payments', {
     method: 'POST',
     headers,
-    body: JSON.stringify(body)
+    body: JSON.stringify(reqestBody)
   })
+
+  const responseBody = await res.json() as any
   
-  if (!res.ok) throw new HttpException('Unexpected payment error', res.status)
-  try {
-    return res.json() as Promise<CreatePaymentResponseDto>
-  } catch (e) {
-    throw new SyntaxError('Failed to parse response of YooKassa')
+  if (res.status >= HttpStatus.INTERNAL_SERVER_ERROR) {
+    throw new Error(`[${res.status}]: Server error`)
+  }  
+
+  if (res.status >= HttpStatus.BAD_REQUEST) {
+    throw new Error(`[${res.status}]: ${responseBody.description}`)
   }
+
+  return responseBody
 }

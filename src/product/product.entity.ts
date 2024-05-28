@@ -37,6 +37,8 @@ export class Product extends IikoEntity {
     this.calories = partial.calories
     this.price = partial.price
     this.category = partial.category
+    this.order = partial.order
+    this.additionalInfo = partial.additionalInfo
   }
 
   @ManyToOne({ hidden: true, lazy: true })

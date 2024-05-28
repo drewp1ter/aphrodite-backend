@@ -12,10 +12,10 @@ export class UsersSeeder extends Seeder {
     let userRole = await em.findOne(Role, { role: RoleEnum.User })
     userRole ??= new Role(RoleEnum.User)
 
-    const admin = new UserFactory(em).makeEntity()
+    const admin = new UserFactory(em).each(user => user.name = 'admin').makeEntity()
     admin.roles.set([userRole, adminRole])
 
-    const user = new UserFactory(em).makeEntity()
+    const user = new UserFactory(em).each(user => user.name = 'user').makeEntity()
     user.roles.add(userRole)
 
     em.persist([admin, user])

@@ -5,6 +5,7 @@ import { YookassaService } from './yookassa.service'
 @Module({
   controllers: [YookassaController],
   providers: [YookassaService],
-  imports: []
+  imports: [],
+  exports: [YookassaService]
 })
 export class YookassaModule {}

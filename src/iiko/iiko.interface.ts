@@ -5,6 +5,7 @@ export interface IGroup {
   name: string
   description: string | null
   tags: string[]
+  additionalInfo: string | null
   isDeleted: boolean
 }
 
@@ -57,4 +58,8 @@ export interface INomenclature {
   groups: IGroup[]
   products: IProduct[]
   revision: number
+}
+
+export interface UpdateProductsBody {
+  token: string
 }

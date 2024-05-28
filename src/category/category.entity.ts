@@ -13,8 +13,10 @@ export class Category extends IikoEntity {
     this.iikoId = partial.iikoId
     this.name = partial.name
     this.description = partial.description ?? ''
+    this.order = partial.order
     this.createdAt = partial.createdAt
     this.updatedAt = partial.updatedAt
+    this.additionalInfo = partial.additionalInfo
   }
 
   @OneToMany(() => CategoryImage, image => image.category, { orphanRemoval: true })

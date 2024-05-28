@@ -50,12 +50,12 @@ describe('Auth', () => {
   it('POST /auth/sign-up => should return bad password, name, phone and email errors', async () => {
     const res = await request(app.getHttpServer()).post('/auth/sign-up').send({ name: '', phone: '', password: '', email: '_' })
     expect(res.body).toEqual({
-      message: 'Input data validation failed',
+      message: 'Ошибка валидации, пожалуйста проверьте введенные вами данные',
       errors: {
-        nameisNotEmpty: 'name should not be empty',
-        emailisEmail: 'email должен быть электронной почтой',
-        passwordisLength: 'пароль должен быть длиннее или равен 8 символам',
-        phoneisPhoneNumber: 'телефон должен быть действительным номером телефона'
+        'name.isNotEmpty': 'name should not be empty',
+        'email.isEmail': 'email должен быть электронной почтой',
+        'password.isLength': 'пароль должен быть длиннее или равен 8 символам',
+        'phone.isPhoneNumber': 'телефон должен быть действительным номером телефона'
       }
     })
     expect(res.status).toBe(400)
@@ -81,10 +81,10 @@ describe('Auth', () => {
       .send({ user: { email: '', password: '' } })
     expect(res.body).toEqual({
       errors: {
-        emailisNotEmpty: 'email не должен быть пустым.',
-        passwordisNotEmpty: 'пароль не должен быть пустым.'
+        'email.isNotEmpty': 'email не должен быть пустым.',
+        'password.isNotEmpty': 'пароль не должен быть пустым.'
       },
-      message: 'Input data validation failed'
+      message: 'Ошибка валидации, пожалуйста проверьте введенные вами данные'
     })
     expect(res.status).toBe(400)
   })

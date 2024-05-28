@@ -4,61 +4,88 @@ import {
   Body,
   UsePipes,
   BadRequestException,
-  InternalServerErrorException,
+  ServiceUnavailableException,
   ParseIntPipe,
   Get,
   Param,
   Delete,
   Query,
-  Patch
+  Patch,
 } from '@nestjs/common'
 import { ForeignKeyConstraintViolationException, CheckConstraintViolationException } from '@mikro-orm/mysql'
+import { NotFoundError } from '@mikro-orm/core'
 import { ValidationPipe } from '../shared/pipes/validation.pipe'
+import { WorkingTimeValidationPipe } from '../shared/pipes/working-time.pipe'
 import { OrderService } from './order.service'
 import { YookassaService } from '../yookassa/yookassa.service'
+import { DeliveryPriceService } from '../delivery-price/delivery-price.service'
 import { CreateOrderDto } from './dto/create-order.dto'
 import { Roles } from '../role/roles.decorator'
 import { User } from '../user/user.decorator'
 import { config } from '../config'
 import { OrderItemDto } from '../order-item/dto/order-item.dto'
+import { WorkingDaysError, WorkingTimeError } from '../shared/interfaces/working-time-error.interface'
 
 @Controller('orders')
 export class OrderController {
-  constructor(private readonly orderService: OrderService, private readonly yookassaService: YookassaService) {}
+  constructor(
+    private readonly orderService: OrderService, 
+    private readonly yookassaService: YookassaService,
+    private readonly deliveryPriceService: DeliveryPriceService
+  ) {}
 
   @UsePipes(new ValidationPipe())
+  @UsePipes(new WorkingTimeValidationPipe())
   @Post()
   async create(@Body() createOrderDto: CreateOrderDto) {
     try {
+      let deliveryPrice = 0
+      if (createOrderDto.address) {
+        const existDeliveryPrice = await this.deliveryPriceService.findOneByName(createOrderDto.address.city)
+        deliveryPrice = existDeliveryPrice.price
+      }
+      
       const order = await this.orderService.create(createOrderDto)
 
       if (createOrderDto.paymentType === 'online') {
-        const description = `Заказ №${order.id}\n${order.items
-          .map((item) => `${item.product.category.name}: ${item.product.name} * ${item.amount}\n`)
-          .join('')}`
-
-        const payment = await this.yookassaService.createPayment({
-          amount: parseFloat(order.total),
-          idempotenceKey: order.id.toString(),
-          description,
-          metadata: { orderId: order.id }
-        })
-
-        if (payment.status === 'pending') {
-          return { redirectUrl: payment.confirmation.confirmation_url }
+        try {
+          const payment = await this.yookassaService.createPayment({
+            amount: parseFloat(order.total) + deliveryPrice,
+            idempotenceKey: order.id.toString(),
+            description: `Заказ №${order.id}, ${createOrderDto.phone}`,
+            metadata: { orderId: order.id }
+          })
+  
+          if (payment.status === 'pending') {
+            return { redirectUrl: payment.confirmation.confirmation_url }
+          }
+        } catch {
+          throw new ServiceUnavailableException('Ошибка платежной системы.')
         }
-
-        throw new InternalServerErrorException('The payment system returns bad status.')
       }
 
-      return { redirectUrl: config.thankYouPage }
+      return { redirectUrl: config.thankYouPagePaymentCash }
     } catch (e) {
       if (e instanceof ForeignKeyConstraintViolationException) {
-        throw new BadRequestException('Product not found.')
+        throw new BadRequestException('Продукт не найден.')
       }
+
       if (e instanceof CheckConstraintViolationException) {
-        throw new BadRequestException('Item amount is incorrect.')
+        throw new BadRequestException('Неверное количество продуктов.')
       }
+
+      if (e instanceof NotFoundError) {
+        throw new BadRequestException('Указано не существующее имя населенного пункта.')
+      }
+
+      if (e instanceof WorkingTimeError) {
+        throw new ServiceUnavailableException(`Время заказа "${e.message}" ограничено с ${e.startTime} до ${e.endTime}.`)
+      }
+
+      if (e instanceof WorkingDaysError) {
+        throw new ServiceUnavailableException(`Возможность заказа "${e.message}" доступна только в следующие дни недели: ${e.days}`)
+      }
+
       throw e
     }
   }

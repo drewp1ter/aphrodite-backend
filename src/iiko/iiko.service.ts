@@ -40,6 +40,7 @@ export class IikoService {
           name: category.name.slice(config.iiko.categoryMarker.length),
           description: category.description ?? '',
           order: category.order,
+          additionalInfo: category.additionalInfo ?? '',
           isDeleted: category.isDeleted,
           iikoId: category.id
         })
@@ -64,6 +65,7 @@ export class IikoService {
               order: product.order,
               isDeleted: product.isDeleted,
               iikoId: product.id,
+              additionalInfo: product.additionalInfo ?? '',
               category
             })
           )
@@ -143,11 +145,11 @@ export class IikoService {
     })
   }
 
-  isGroupValid(group: IGroup) {
+  private isGroupValid(group: IGroup) {
     return group.name.startsWith(config.iiko.categoryMarker)
   }
 
-  isImageLinkCorrect(imageLink: string): boolean {
+  private isImageLinkCorrect(imageLink: string): boolean {
     return 'IMAGE_UPLOAD_ERROR' !== imageLink
   }
 }

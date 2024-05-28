@@ -1,18 +1,23 @@
 import { ArgumentMetadata, BadRequestException, HttpException, HttpStatus, Injectable, PipeTransform } from '@nestjs/common'
 import { plainToClass } from 'class-transformer'
-import { validate } from 'class-validator'
+import { ValidationError, validate } from 'class-validator'
 
 @Injectable()
 export class ValidationPipe implements PipeTransform<any> {
-  async transform(value, metadata: ArgumentMetadata) {
+  async transform(value: any, metadata: ArgumentMetadata) {
     if (!value) {
       throw new BadRequestException('No data submitted')
+    }
+
+    if (Object.prototype.toString.apply(value) === '[object Array]') {
+      throw new BadRequestException('Expecting an object but received an array')
     }
 
     const { metatype } = metadata
     if (!metatype || !this.toValidate(metatype)) {
       return value
     }
+
     const object = plainToClass(metatype, value)
     const errors = await validate(object)
     if (errors.length > 0) {
@@ -21,13 +26,19 @@ export class ValidationPipe implements PipeTransform<any> {
     return value
   }
 
-  private buildError(errors) {
+  private buildError(errors: ValidationError[]) {
     const result = {}
     errors.forEach((el) => {
       const prop = el.property
-      Object.entries(el.constraints).forEach((constraint) => {
-        result[`${prop}.${constraint[0]}`] = `${constraint[1]}`
-      })
+      if (el.constraints) {
+        Object.entries(el.constraints).forEach((constraint) => {
+          result[`${prop}.${constraint[0]}`] = `${constraint[1]}`
+        })
+      }
+
+      if (el.children) {
+        Object.assign(result, this.buildError(el.children))
+      }
     })
     return result
   }

@@ -1,7 +1,8 @@
-import { Controller, Post } from '@nestjs/common'
+import { Body, Controller, Post } from '@nestjs/common'
 import { ApiBearerAuth } from '@nestjs/swagger'
-import { Roles } from '../role/roles.decorator'
 import { IikoService } from './iiko.service'
+import { UpdateProductsBody } from './iiko.interface'
+import { config } from '../config'
 
 @ApiBearerAuth()
 @Controller('iiko')
@@ -9,8 +10,8 @@ export class IikoController {
   constructor(private readonly iikoService: IikoService) {}
 
   @Post('update-products')
-  @Roles('admin')
-  async updateProducts() {
+  async updateProducts(@Body() body: UpdateProductsBody) {
+    if (body.token !== config.iiko.updateToken) return
     return this.iikoService.updateProducts()
   }
 }

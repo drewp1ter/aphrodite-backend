@@ -2,6 +2,10 @@ import { config as dotenvConfig } from 'dotenv'
 if (process.env.NODE_ENV !== 'test') dotenvConfig()
 
 const defaultConfig = {
+  isProduction: process.env.NODE_ENV === 'production',
+  isDevelopment: process.env.NODE_ENV === 'development',
+  isTest: process.env.NODE_ENV === 'test',
+  appLogDirectory: '.',
   debug: false,
   defaultPageSize: 100,
   jwt: {
@@ -23,7 +27,8 @@ const defaultConfig = {
   iiko: {
     apiLogin: '',
     organizationId: '',
-    categoryMarker: '#'
+    categoryMarker: '#',
+    updateToken: ''
   },
   telegram: {
     token: '',
@@ -33,10 +38,16 @@ const defaultConfig = {
     shopId: '',
     secretKey: ''
   },
-  thankYouPage: 'http://localhost:3001/thankyou'
+  workingHours: {
+    start: '9:00',
+    end: '22:00'
+  },
+  thankYouPagePaymentCash: 'http://localhost:3001/thankyou',
+  thankYouPagePaymentOnline: 'http://localhost:3001/thankyou'
 }
 
 export const config = assignDefined(defaultConfig, {
+  appLogDirectory: process.env.APP_LOG_DIRECTORY,
   debug: process.env.DEBUG && 'true' === process.env.DEBUG,
   jwt: assignDefined(defaultConfig.jwt, {
     secret: process.env.JWT_SECRET,
@@ -57,17 +68,24 @@ export const config = assignDefined(defaultConfig, {
   iiko: assignDefined(defaultConfig.iiko, {
     apiLogin: process.env.IIKO_API_LOGIN,
     organizationId: process.env.IIKO_ORGANIZATION_ID,
-    categoryMarker: process.env.IIKO_CATEGORY_MARKER
+    categoryMarker: process.env.IIKO_CATEGORY_MARKER,
+    updateToken: process.env.IIKO_UPDATE_TOKEN
   }),
   telegram: assignDefined(defaultConfig.telegram, {
     token: process.env.TELEGRAM_TOKEN,
-    chatId: process.env.TELEGRAM_CHAT_ID
+    chatIdForOrderCreated: process.env.TELEGRAM_CHAT_ID_FOR_ORDER_CREATED,
+    chatIdForOrderConfirmed: process.env.TELEGRAM_CHAT_ID_FOR_ORDER_CONFIRMED
   }),
   yookassa: assignDefined(defaultConfig.yookassa, {
     shopId: process.env.YOOKASSA_SHOP_ID,
     secretKey: process.env.YOOKASSA_SECRET_KEY
   }),
-  thankYouPage: process.env.THANK_YOU_PAGE
+  workingHours: {
+    start: process.env.WORKING_HOURS_START,
+    end: process.env.WORKING_HOURS_END
+  },
+  thankYouPagePaymentCash: process.env.THANK_YOU_PAGE_PYMENT_CASH,
+  thankYouPagePaymentOnline: process.env.THANK_YOU_PAGE_PYMENT_ONLINE
 })
 
 function assignDefined(target, ...sources) {

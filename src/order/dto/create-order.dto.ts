@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsPhoneNumber, MaxLength, IsArray, IsOptional, IsEnum } from 'class-validator'
+import { IsNotEmpty, IsPhoneNumber, MaxLength, IsArray, IsOptional, IsEnum, ValidateNested } from 'class-validator'
+import { Type } from 'class-transformer'
 import { CreateAddressDto } from '../../address/dto/create-address.dto'
 import { OrderItemDto } from '../../order-item/dto/order-item.dto'
 import { OrderPaymentType } from '../order.interface'
@@ -19,10 +20,13 @@ export class CreateOrderDto {
   @IsEnum(OrderPaymentType)
   readonly paymentType!: OrderPaymentType
 
-  @IsNotEmpty({ message: 'Адрес должен быть не пустым' })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => CreateAddressDto)
   readonly address!: CreateAddressDto
 
-  @IsNotEmpty()
   @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => OrderItemDto)
   readonly items!: OrderItemDto[]
 }

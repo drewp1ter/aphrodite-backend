@@ -1,4 +1,5 @@
 import request from 'supertest'
+import MockDate from 'mockdate'
 import { faker } from '@faker-js/faker'
 import { MikroORM } from '@mikro-orm/core'
 import { JwtService } from '@nestjs/jwt'
@@ -7,12 +8,14 @@ import { INestApplication } from '@nestjs/common'
 import mikroConfig from '../../mikro-orm.config'
 import { AppModule } from '../../app.module'
 import { OrderSeeder } from '../../seeder/order.seeder'
+import { DeliveryPriceSeeder } from '../../seeder/delivery-price.seeder'
 import { Product } from '../../product/product.entity'
 import { Order } from '../order.entity'
 import { OrderStatus } from '../order.interface'
 import { User } from '../../user/user.entity'
 import { OrderItem } from '../../order-item/order-item.entity'
 import { Address } from '../../address/address.entity'
+import { DeliveryPrice } from '../../delivery-price/delivery-price.entity'
 
 describe('Order', () => {
   let app: INestApplication
@@ -37,6 +40,7 @@ describe('Order', () => {
     app = moduleRef.createNestApplication()
     await app.init()
 
+    await seeder.seed(DeliveryPriceSeeder)
     await seeder.seed(OrderSeeder)
     user = await orm.em.findOneOrFail(User, { name: 'user' })
     admin = await orm.em.findOneOrFail(User, { name: 'admin' })
@@ -45,21 +49,22 @@ describe('Order', () => {
     jwtUser = jwtService.sign({ id: user.id, roles: user.roles.map((role) => role.role) })
     jwtAdmin = jwtService.sign({ id: admin.id, roles: admin.roles.map((role) => role.role) })
 
-    const dummyFetch: any = () => ({ ok: true, status: 200 })
+    const dummyFetch: any = () => ({ ok: true, status: 200, json: async () => ({}) })
     jest.spyOn(global, 'fetch').mockImplementation(dummyFetch)
   })
 
   it('POST /orders => should create the new order', async () => {
-    const products = await orm.em.findAll(Product)
+    const products = await orm.em.findAll(Product, { limit: 3 })
+    const deliveryPrice = await orm.em.findOneOrFail(DeliveryPrice, { id: 1 })
     const res = await request(app.getHttpServer())
-      .post(`/orders`)
+      .post('/orders')
       .send({
         phone: faker.helpers.fromRegExp('+79[0-9]{9}'),
         name: faker.person.fullName(),
         comment: faker.lorem.words(8),
         paymentType: 'cash',
         address: {
-          city: faker.location.city(),
+          city: deliveryPrice.name,
           address: faker.location.streetAddress()
         },
         items: products.map((product, idx) => ({ productId: product.id, amount: idx + 1 }))
@@ -67,6 +72,83 @@ describe('Order', () => {
     const ordersCount = await orm.em.count(Order)
     expect(res.status).toBe(201)
     expect(ordersCount).toBe(3)
+    expect(res.body).toEqual({
+      redirectUrl: expect.anything()
+    })
+  })
+
+  it("POST /orders => shouldn't create the new order with night time", async () => {
+    MockDate.set('2024-05-24 5:00')
+    const products = await orm.em.findAll(Product, { where: { category: { additionalInfo: { $ne: '' } } } })
+    const deliveryPrice = await orm.em.findOneOrFail(DeliveryPrice, { id: 1 })
+    const res = await request(app.getHttpServer())
+      .post('/orders')
+      .send({
+        phone: faker.helpers.fromRegExp('+79[0-9]{9}'),
+        name: faker.person.fullName(),
+        comment: faker.lorem.words(8),
+        paymentType: 'cash',
+        address: {
+          city: deliveryPrice.name,
+          address: faker.location.streetAddress()
+        },
+        items: products.map((product, idx) => ({ productId: product.id, amount: idx + 1 }))
+      })
+    const ordersCount = await orm.em.count(Order)
+    expect(res.status).toBe(503)
+    expect(ordersCount).toBe(3)
+    expect(res.body).toEqual({
+      error: 'Service Unavailable',
+      message: expect.anything(),
+      statusCode: 503
+    })
+
+    MockDate.reset()
+  })
+
+  it("POST /orders => shouldn't create the new order on weekend", async () => {
+    MockDate.set('2024-05-25 15:00')
+    const products = await orm.em.findAll(Product, { where: { category: { additionalInfo: { $ne: '' } } } })
+    const deliveryPrice = await orm.em.findOneOrFail(DeliveryPrice, { id: 1 })
+    const res = await request(app.getHttpServer())
+      .post('/orders')
+      .send({
+        phone: faker.helpers.fromRegExp('+79[0-9]{9}'),
+        name: faker.person.fullName(),
+        comment: faker.lorem.words(8),
+        paymentType: 'cash',
+        address: {
+          city: deliveryPrice.name,
+          address: faker.location.streetAddress()
+        },
+        items: products.map((product, idx) => ({ productId: product.id, amount: idx + 1 }))
+      })
+    const ordersCount = await orm.em.count(Order)
+    expect(res.status).toBe(503)
+    expect(ordersCount).toBe(3)
+    expect(res.body).toEqual({
+      error: 'Service Unavailable',
+      message: expect.anything(),
+      statusCode: 503
+    })
+
+    MockDate.reset()
+  })
+
+  it('POST /orders => should create the new order without address', async () => {
+    const products = await orm.em.findAll(Product, { limit: 3 })
+    const res = await request(app.getHttpServer())
+      .post('/orders')
+      .send({
+        phone: faker.helpers.fromRegExp('+79[0-9]{9}'),
+        name: faker.person.fullName(),
+        comment: faker.lorem.words(8),
+        paymentType: 'cash',
+        items: products.map((product, idx) => ({ productId: product.id, amount: idx + 1 }))
+      })
+    const ordersCount = await orm.em.count(Order)
+    expect(res.status).toBe(201)
+    expect(ordersCount).toBe(4)
     expect(res.body).toEqual({
       redirectUrl: expect.anything()
     })
@@ -87,15 +169,18 @@ describe('Order', () => {
         },
         items: products.map((product) => ({ productId: product.id, amount: 0 }))
       })
+
     expect(res.status).toBe(400)
     expect(res.body).toEqual({
-      error: 'Bad Request',
-      message: 'Item amount is incorrect.',
-      statusCode: 400
+      message: 'Ошибка валидации, пожалуйста проверьте введенные вами данные',
+      errors: {
+        'amount.isPositive': 'amount must be a positive number'
+      }
     })
   })
 
   it("POST /orders => shouldn't create the new order with bad productId", async () => {
+    const deliveryPrice = await orm.em.findOneOrFail(DeliveryPrice, { id: 1 })
     const res = await request(app.getHttpServer())
       .post(`/orders`)
       .send({
@@ -104,14 +189,14 @@ describe('Order', () => {
         comment: faker.lorem.words(8),
         paymentType: 'online',
         address: {
-          city: faker.location.city(),
+          city: deliveryPrice.name,
           address: faker.location.streetAddress()
         },
         items: [{ productId: 999, amount: 1 }]
       })
     expect(res.body).toEqual({
       error: 'Bad Request',
-      message: 'Product not found.',
+      message: 'Продукт не найден.',
       statusCode: 400
     })
     expect(res.status).toBe(400)
@@ -145,6 +230,7 @@ describe('Order', () => {
               carbohydrates: userOrders[0].items[0].product.carbohydrates,
               createdAt: expect.anything(),
               description: userOrders[0].items[0].product.description,
+              additionalInfo: expect.anything(),
               fats: userOrders[0].items[0].product.fats,
               flags: userOrders[0].items[0].product.flags,
               id: userOrders[0].items[0].product.id,
@@ -208,6 +294,7 @@ describe('Order', () => {
             carbohydrates: userOrder.items[0].product.carbohydrates,
             createdAt: expect.anything(),
             description: userOrder.items[0].product.description,
+            additionalInfo: expect.anything(),
             fats: userOrder.items[0].product.fats,
             flags: userOrder.items[0].product.flags,
             id: userOrder.items[0].product.id,
